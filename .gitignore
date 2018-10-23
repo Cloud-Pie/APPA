@@ -12,3 +12,5 @@
 *.out
 build
 vendor/
+APPA
+.appa.yaml

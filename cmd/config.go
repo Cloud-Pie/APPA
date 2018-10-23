@@ -15,9 +15,12 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // configCmd represents the config command
@@ -25,10 +28,7 @@ var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Operations on your config File",
 	Long:  `Config command allows you to edit or see your config file.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("To edit your config , run 'appa config edit'")
-		fmt.Println("To see your config, run 'appa config show'")
-	},
+	//	Run: func(cmd *cobra.Command, args []string) {	}
 }
 
 func init() {
@@ -43,4 +43,14 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// configCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func askQuestions(comingFromStartup bool) {
+	if comingFromStartup { //don't ask questions twice when config edit is called without file
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Your token: ")
+		text, _ := reader.ReadString('\n')
+		fmt.Println(text)
+		viper.Set("token", text)
+	}
 }

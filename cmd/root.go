@@ -23,7 +23,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var home string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -33,7 +33,7 @@ var rootCmd = &cobra.Command{
 It sends your data to cloud ,processes it and allows you to donwload data afterwards.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+	//Run: func(cmd *cobra.Command, args []string) {},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -46,6 +46,13 @@ func Execute() {
 }
 
 func init() {
+	var err error
+	home, _ = homedir.Dir() //FIXME: set home to homedir don't forget to delete next line
+	home, err = ".", nil    //and delete this line
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
@@ -60,26 +67,21 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
 
-		// Search config in home directory with name ".appa" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".appa")
-	}
+	// Find home directory.
+
+	// Search config in home directory with name ".appa" (without extension).
+	viper.AddConfigPath(home)
+	viper.SetConfigName(".appa")
 
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	} else {
+		fmt.Println("Looks like you don't have a config file let's create one...")
+		askQuestions(true)
+		viper.WriteConfigAs(home + "/.appa.yaml")
 	}
 }
