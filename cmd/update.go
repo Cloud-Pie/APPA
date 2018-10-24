@@ -16,11 +16,13 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/spf13/cobra"
 )
 
-const githubRepo = "https://github.com/Cloud-Pie/APPA"
+const githubRepo = "https://api.github.com/repos/Cloud-Pie/APPA/releases"
 
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
@@ -29,7 +31,9 @@ var updateCmd = &cobra.Command{
 	Long: `Please use this everytime a new version is available.
 Availability of new version will be checked with every command`,
 	Run: func(cmd *cobra.Command, args []string) {
+		requireInit()
 		fmt.Println("update called")
+		updateProgram()
 	},
 }
 
@@ -45,4 +49,14 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// updateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func updateProgram() {
+	resp, err := http.Get(githubRepo)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	contents, err := ioutil.ReadAll(resp.Body)
+	fmt.Printf("%s\n", string(contents))
 }

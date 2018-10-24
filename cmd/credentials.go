@@ -21,37 +21,29 @@ import (
 	"github.com/spf13/viper"
 )
 
-// editCmd represents the edit command
-var editCmd = &cobra.Command{
-	Use:   "edit",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+// credentialsCmd represents the credentials command
+var credentialsCmd = &cobra.Command{
+	Use:   "credentials",
+	Short: "Shows your already save credentials",
+	Long: `You save your credentials with the appa init command. Once saved,
+you can see them by running this command`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Edit your config file")
-
-		askQuestions(true)
-		if err := viper.WriteConfig(); err != nil {
-			fmt.Println(err)
-		}
-
+		requireInit()
+		fmt.Println("credentials called")
+		fmt.Println(viper.AllSettings())
 	},
 }
 
 func init() {
-	configCmd.AddCommand(editCmd)
+	rootCmd.AddCommand(credentialsCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// editCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// credentialsCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// editCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// credentialsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

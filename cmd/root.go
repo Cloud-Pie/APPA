@@ -30,7 +30,7 @@ var rootCmd = &cobra.Command{
 	Use:   "appa",
 	Short: "Automated parallel processing application",
 	Long: `Appa is the client CLI application for our parallel processing server.
-It sends your data to cloud ,processes it and allows you to donwload data afterwards.`,
+It sends your data to cloud ,processes it and allows you to download data afterwards.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//Run: func(cmd *cobra.Command, args []string) {},
@@ -79,9 +79,12 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	} else {
-		fmt.Println("Looks like you don't have a config file let's create one...")
-		askQuestions(true)
-		viper.WriteConfigAs(home + "/.appa.yaml")
+	}
+}
+
+func requireInit() {
+	if viper.ReadInConfig() != nil {
+		fmt.Println("Looks like you don't have a config file yet. Initialize a config file by calling appa init")
+		os.Exit(1)
 	}
 }
