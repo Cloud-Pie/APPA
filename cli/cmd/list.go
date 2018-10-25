@@ -16,7 +16,9 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/spf13/cobra"
 )
 
@@ -32,7 +34,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		requireInit()
-		fmt.Println("list called")
+		fmt.Print("list called")
+		listTasks()
 	},
 }
 
@@ -48,4 +51,14 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func listTasks() {
+
+	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond) // Build our new spinner
+	//	s.Color("red")
+	s.Prefix = "Calling list  " // Set the spinner color to red
+	s.Start()
+	time.Sleep(4 * time.Second)
+	s.Stop()
 }

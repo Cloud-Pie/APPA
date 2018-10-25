@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/Cloud-Pie/APPA/cmd"
+import "github.com/Cloud-Pie/APPA/cli/cmd"
 
 func main() {
 	cmd.Execute()
