@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func runServer()  {
+func RunServer()  {
 	router := NewRouter()
 	log.Fatal(http.ListenAndServe(":8080", router))
 	log.Fatal("Server started on port 8080")
