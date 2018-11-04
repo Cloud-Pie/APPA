@@ -1,0 +1,6 @@
+package run
+
+func initConfig()  {
+
+
+}
