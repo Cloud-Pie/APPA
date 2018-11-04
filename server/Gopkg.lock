@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "6916a9d52c38377a0dd036df48cafded2cd4df58"
+  revision = "2e0d705acfa3c5966283c73c969defe05d4705fc"
 
 [[projects]]
   name = "github.com/gorilla/context"
