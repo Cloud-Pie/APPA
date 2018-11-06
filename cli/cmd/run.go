@@ -17,6 +17,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/Cloud-Pie/APPA/server/run"
+	"github.com/gofrs/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -33,6 +35,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		requireInit()
 		fmt.Println("run called")
+		runTask()
 	},
 }
 
@@ -48,4 +51,11 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func runTask() {
+	var newTask run.Task
+	u1 := uuid.Must(uuid.NewV4())
+	newTask.ID = u1.String()
+	fmt.Println(newTask.ID)
 }

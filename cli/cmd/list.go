@@ -15,10 +15,13 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
-	"time"
+	"io/ioutil"
+	"net/http"
+	"os"
 
-	"github.com/briandowns/spinner"
+	"github.com/Cloud-Pie/APPA/server/run"
 	"github.com/spf13/cobra"
 )
 
@@ -34,8 +37,9 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		requireInit()
-		fmt.Print("list called")
+		fmt.Println("list called")
 		listTasks()
+
 	},
 }
 
@@ -55,10 +59,20 @@ func init() {
 
 func listTasks() {
 
-	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond) // Build our new spinner
-	//	s.Color("red")
-	s.Prefix = "Calling list  " // Set the spinner color to red
-	s.Start()
-	time.Sleep(4 * time.Second)
-	s.Stop()
+	resp, err := http.Get("http://localhost:8080/list")
+	if err != nil {
+		fmt.Println("Server currently not available")
+		os.Exit(1)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	//	fmt.Println(string(body))
+	var tasks []run.Task
+	if err := json.Unmarshal(body, &tasks); err != nil {
+		fmt.Println(err)
+	}
+	for _, k := range tasks {
+		fmt.Printf("%s -> %d\n", k.ID, k.Status)
+	}
+
 }

@@ -3,9 +3,12 @@ package main
 // TODO: implement /runTask
 //TODO: implement /download
 //TODO: implement /list
+
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/Cloud-Pie/APPA/server/run"
 )
 
 func ping(w http.ResponseWriter, r *http.Request) {
@@ -21,9 +24,9 @@ func download(w http.ResponseWriter, r *http.Request) {
 }
 
 func listTasks(w http.ResponseWriter, r *http.Request) {
-	tasks := []Task{{
-		1, Running,
-	}, {2, Failed}, {3, Completed}, {4, InQueue}, {5, Running}, {6, Completed}}
+	tasks := []run.Task{{
+		1, run.Running,
+	}, {2, run.Failed}, {3, run.Completed}, {4, run.InQueue}, {5, run.Running}, {6, run.Completed}}
 	js, err := json.Marshal(tasks)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

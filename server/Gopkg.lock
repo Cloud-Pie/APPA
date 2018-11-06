@@ -2,26 +2,24 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/Cloud-Pie/APPA"
-  packages = ["server/run"]
-  revision = "f088cc0d53ff0201c47116b1e4def3c24895f7fc"
-
-[[projects]]
+  digest = "1:c79fb010be38a59d657c48c6ba1d003a8aa651fa56b579d959d74573b7dff8e1"
   name = "github.com/gorilla/context"
   packages = ["."]
+  pruneopts = "UT"
   revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
   version = "v1.1.1"
 
 [[projects]]
+  digest = "1:e73f5b0152105f18bc131fba127d9949305c8693f8a762588a82a48f61756f5f"
   name = "github.com/gorilla/mux"
   packages = ["."]
+  pruneopts = "UT"
   revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
   version = "v1.6.2"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d4d4a203c99c913735c2795ad47e5de7c44fb616822b81c4390b35d19c9a7737"
+  input-imports = ["github.com/gorilla/mux"]
   solver-name = "gps-cdcl"
   solver-version = 1
