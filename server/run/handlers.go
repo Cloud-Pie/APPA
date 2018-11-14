@@ -46,6 +46,6 @@ func DeployAndRunApplication(w http.ResponseWriter, r *http.Request)  {
 		instanceType = "t2.large"
 	}
 	// here need to  pass application specifc parameters as well
-	launchVMandDeploy("s3buckerNameTobeDecided",instanceType)
+	go launchVMandDeploy("s3buckerNameTobeDecided",instanceType)
 	w.Write([]byte("The process has started, check the logs for details!!"))
 }
