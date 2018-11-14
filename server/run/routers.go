@@ -2,6 +2,7 @@ package run
 import (
 	"net/http"
 	"github.com/gorilla/mux"
+	"strings"
 )
 
 type Route struct {
@@ -62,4 +63,11 @@ var routes = Routes{
 		"/getListFiles",
 		getListFiles,
 	},
+	Route{
+		"DeployAndRunApplication",
+		strings.ToUpper("Get"),
+		"/deployAndRunApplication/{instancetype}/",
+		DeployAndRunApplication,
+	},
+
 }
