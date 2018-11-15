@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Cloud-Pie/APPA/server/run"
+	"github.com/Cloud-Pie/APPA/server/task"
 	"github.com/spf13/cobra"
 )
 
@@ -59,7 +59,8 @@ func init() {
 
 func listTasks() {
 
-	resp, err := http.Get("http://localhost:8080/list")
+	resp, err := http.Get("http://localhost:8080/getListFiles")
+
 	if err != nil {
 		fmt.Println("Server currently not available")
 		os.Exit(1)
@@ -67,7 +68,7 @@ func listTasks() {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	//	fmt.Println(string(body))
-	var tasks []run.Task
+	var tasks []task.Task
 	if err := json.Unmarshal(body, &tasks); err != nil {
 		fmt.Println(err)
 	}
