@@ -16,12 +16,13 @@ const (
 )
 
 type AWSConfigStruct struct {
-	AwsAccessKeyId   		string `json:"AwsAccessKeyId"`
-	AwsSecretAccessKey   	string `json:"AwsSecretAccessKey"`
-	Region 					string `json:"Region"`
-	KeyPairName				string `json:"KeyName"`
-	SubnetId				string `json:"SubnetId"`
-	SecurityGroup			string `json:"SecurityGroup"`
+	AwsAccessKeyId   		string 		`json:"AwsAccessKeyId"`
+	AwsSecretAccessKey   	string 		`json:"AwsSecretAccessKey"`
+	Region 					string 		`json:"Region"`
+	KeyPairName				string 		`json:"KeyName"`
+	SubnetId				string 		`json:"SubnetId"`
+	SecurityGroup			string 		`json:"SecurityGroup"`
+	S3BucketName			string 		`json:"S3BucketName"`
 }
 type Ec2Instances struct {
 	InstanceId       		string 		`json:"InstanceId"`

@@ -46,22 +46,34 @@ func NewRouter() *mux.Router {
 var routes = Routes{
 	Route{
 		"Index",
-		"GET",
+		strings.ToUpper("Get"),
 		"/",
 		Index,
 	},
 
 	Route{
-		"GetData",
-		"GET",
-		"/getData",
-		getData,
+		"DownloadData",
+		strings.ToUpper("Get"),
+		"/downloadData",
+		DownloadData,
 	},
 	Route{
-		"GetListOfAllAvailableFiles",
-		"GET",
-		"/getListFiles",
-		getListFiles,
+		"ListAllStoredFiles",
+		strings.ToUpper("Get"),
+		"/listAllStoredFiles",
+		ListAllStoredFiles,
+	},
+	Route{
+		"GetAllTestsInformation",
+		strings.ToUpper("Get"),
+		"/getAllTestsInformation",
+		GetAllTestsInformation,
+	},
+	Route{
+		"GetTestInformation",
+		strings.ToUpper("Get"),
+		"/getTestInformation/testname",
+		GetTestInformation,
 	},
 	Route{
 		"DeployAndRunApplication",

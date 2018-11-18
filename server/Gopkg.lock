@@ -28,17 +28,22 @@
     "aws/session",
     "aws/signer/v4",
     "internal/ini",
+    "internal/s3err",
     "internal/sdkio",
     "internal/sdkrand",
     "internal/sdkuri",
     "internal/shareddefaults",
     "private/protocol",
     "private/protocol/ec2query",
+    "private/protocol/eventstream",
+    "private/protocol/eventstream/eventstreamapi",
     "private/protocol/query",
     "private/protocol/query/queryutil",
     "private/protocol/rest",
+    "private/protocol/restxml",
     "private/protocol/xml/xmlutil",
     "service/ec2",
+    "service/s3",
     "service/sts"
   ]
   revision = "ab1e4ad20b12ab0df8a825805de3e48ad6c59d28"
@@ -61,9 +66,21 @@
   packages = ["."]
   revision = "0b12d6b5"
 
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/mgo.v2"
+  packages = [
+    ".",
+    "bson",
+    "internal/json",
+    "internal/sasl",
+    "internal/scram"
+  ]
+  revision = "9856a29383ce1c59f308dd1cf0363a79b5bef6b5"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e0c0e08db488036b69c2a307ed75797f8c730a19ee045ee9c8ce8d3ec663c91d"
+  inputs-digest = "e99b5db3d4042ad48b01f30e7785ff716052435686d35dee510ae618512fdeac"
   solver-name = "gps-cdcl"
   solver-version = 1

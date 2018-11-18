@@ -9,6 +9,8 @@ import (
 	"log"
 	b64 "encoding/base64"
 	"time"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // this will be responsible for taking the data in the format
@@ -16,19 +18,91 @@ import (
 // starting the process
 // pushing the file to a storage after the process is done
 
-func GetVMStartScript(s3BucketName string)string{
-	var VMStartScript = "#!bin/sh \n"+
-		"echo \"setup\"  \n"+
-		"apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual  \n"+
-		"apt-get update  \n"+
-		"apt-get install -y apt-transport-https ca-certificates curl software-properties-common  \n"
-// add some more code here
+func createS3Bucket(s3BucketName string) bool{
+
+	sessionAWS := session.Must(session.NewSession(&aws.Config{
+		Credentials: credentials.NewStaticCredentials(AWSConfig.AwsAccessKeyId, AWSConfig.AwsSecretAccessKey, ""),
+		Region:      aws.String(AWSConfig.Region),
+	}))
+	// Create S3 service client
+	svc := s3.New(sessionAWS)
+
+	input := &s3.CreateBucketInput{
+		Bucket: aws.String(s3BucketName),
+		CreateBucketConfiguration: &s3.CreateBucketConfiguration{
+			LocationConstraint: aws.String(AWSConfig.Region),
+		},
+	}
+
+	result, err := svc.CreateBucket(input)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case s3.ErrCodeBucketAlreadyExists:
+				log.Println(s3.ErrCodeBucketAlreadyExists, aerr.Error())
+				return true
+
+			case s3.ErrCodeBucketAlreadyOwnedByYou:
+				log.Println(s3.ErrCodeBucketAlreadyOwnedByYou, aerr.Error())
+				return true
+			default:
+				log.Println(aerr.Error())
+				return false
+			}
+		} else {
+			// Print the error, cast err to awserr.Error to get the Code and
+			// Message from an error.
+			log.Println(err.Error())
+			return false
+		}
+	}
+	log.Println(result)
+	return true
+}
+
+func getVMStartScript(gitPath,testName string)string{
+	var VMStartScript = `
+#!bin/sh
+apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
+apt-get update  
+apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+apt-get --assume-yes install git
+apt-get install python-pip python-dev build-essential 
+pip install awscli --upgrade --user
+# Define a timestamp function
+timestamp() {
+  date +"%T"
+}
+FILE_AWSCLI="~/.aws/config"
+/bin/cat <<EOM >FILE_AWSCLI 
+aws_access_key_id=`+AWSConfig.AwsAccessKeyId+`
+aws_secret_access_key=`+AWSConfig.AwsSecretAccessKey+`
+region= `+AWSConfig.Region+`
+output=json
+EOM
+git clone `+ gitPath+ `
+cd openfoam/scripts
+sh ./deploy_app.sh
+$file_name = /results/result.tar.gz 
+while [ -ne $file_name ]
+do
+   sleep 5m
+done
+if [ -e $file_name]
+then
+	new_fileName=/results/`+testName+`.tar.gz
+    mv $file_name $new_fileName
+	aws s3 cp $new_fileName s3://`+AWSConfig.S3BucketName+`/
+else
+    echo "not found"
+fi
+`
 	encodedString:=b64.StdEncoding.EncodeToString([]byte(VMStartScript))
 
 	return encodedString
 }
 
-func startTestVM( s3BucketName, testVMType string)  string {
+func startTestVM( gitAppPath, testVMType,testName string)  string {
 
 	sessionAWS := session.Must(session.NewSession(&aws.Config{
 		Credentials: credentials.NewStaticCredentials(AWSConfig.AwsAccessKeyId, AWSConfig.AwsSecretAccessKey, ""),
@@ -67,7 +141,7 @@ func startTestVM( s3BucketName, testVMType string)  string {
 				},
 			},
 		},
-		UserData: aws.String(GetVMStartScript(s3BucketName)),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName)),
 	}
 
 	result, err := svc.RunInstances(input)
@@ -167,18 +241,36 @@ func getVMPublicIP(startedInstanceId string)  string{
 	return allInstances[0].PublicIpAddress
 }
 
-
-
-
-func launchVMandDeploy(s3BucketName , testVMType string ){
+func launchVMandDeploy(gitAppPath , testVMType string ){
 
 	log.Println("Starting a test VM of type ", testVMType, " and running the application")
 
-	startedInstanceId :=startTestVM(s3BucketName, testVMType)
+	testName:= "appa_"+"randomStringhere"
+
+	startedInstanceId :=startTestVM(gitAppPath, testVMType, testName)
 	if( startedInstanceId==""){
 		log.Fatal("Cannot start test VM, terminating test start again latter")
 		return
 	}
+	mongoSession := GetMongoSession()
+	collection := mongoSession.DB(Database).C(Collection_Name)
+
+
+	AllData := TestInformation{
+		TestName			:  testName,
+		StartTimestamp		:	time.Now().Unix(),
+		NumInstances		:   1,
+		InstanceType		:	testVMType,
+		GitPath				: 	gitAppPath,
+		S3FileName			: 	testName,
+		Phase				:   "Deployment",
+	}
+	if err := collection.Insert(AllData); err != nil {
+		log.Fatal("error ", err)
+	} else {
+		log.Println("#inserted into ", Collection_Name)
+	}
+
 	stopChecking := Schedule(func() {
 		log.Println("waiting for some time for the VM to start and run app")
 		// need to have a mechanism by which I query application and stop checking whether its deployed or not
@@ -192,7 +284,13 @@ func launchVMandDeploy(s3BucketName , testVMType string ){
 	log.Println("Public Ip Address : ",publicAddress )
 	log.Println("Starting the App")
 
-	// after some time the VM needs to be stopped after the test is finished
+	errMongoU := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"phase": "Deployed"}})
+	if errMongoU != nil {
+		log.Fatal("Error : %s", errMongoU)
+	}
+
+	// TODO: after some time the VM needs to be stopped after the test is finished this will be done based upon some notification
+
 	time.Sleep(15 * time.Minute)
 
 
@@ -200,4 +298,71 @@ func launchVMandDeploy(s3BucketName , testVMType string ){
 
 	log.Println(" Terminating the VM")
 	terminateTestVM(startedInstanceId)
+
+	errMonFin := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"endtimestamp": time.Now().Unix(),
+		"phase": "Completed"}})
+	if errMonFin != nil {
+		log.Fatal("Error::%s", errMonFin)
+	}
+	defer mongoSession.Close()
+}
+
+
+func listObjectsInBucket() *s3.ListObjectsOutput{
+
+	// TODO: Need to check whether this is required or not or query mongodb for all the test names as done in the next function
+
+	sessionAWS := session.Must(session.NewSession(&aws.Config{
+		Credentials: credentials.NewStaticCredentials(AWSConfig.AwsAccessKeyId, AWSConfig.AwsSecretAccessKey, ""),
+		Region:      aws.String(AWSConfig.Region),
+	}))
+	// Create S3 service client
+	svc := s3.New(sessionAWS)
+
+	input := &s3.ListObjectsInput{
+		Bucket: aws.String(AWSConfig.S3BucketName),
+		MaxKeys: aws.Int64(2),
+	}
+
+	result, err := svc.ListObjects(input)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case s3.ErrCodeNoSuchBucket:
+				log.Println(s3.ErrCodeNoSuchBucket, aerr.Error())
+			default:
+				log.Println(aerr.Error())
+			}
+		} else {
+			// Print the error, cast err to awserr.Error to get the Code and
+			// Message from an error.
+			log.Println(err.Error())
+		}
+		return nil
+	}
+	// TODO: Need to check this format, currently its directly sent to cli but only names are to be sent to cli
+	log.Println(result)
+	return result
+}
+
+func getAllTestsInformation() []TestInformation{
+	var allTestInformation []TestInformation
+	mongoSession := GetMongoSession()
+	collection := mongoSession.DB(Database).C(Collection_Name)
+	err :=  collection.Find(nil).All(&allTestInformation)
+	if err != nil {
+		log.Fatal("Db Error : ", err)
+	}
+	return  allTestInformation
+}
+func getTestInformation(testName string) TestInformation{
+	var testInformation TestInformation
+	mongoSession := GetMongoSession()
+	collection := mongoSession.DB(Database).C(Collection_Name)
+	err :=  collection.Find(bson.M{"testname":testName}).One(&testInformation)
+	if err != nil {
+		log.Fatal("Db Error : ", err)
+
+	}
+	return  testInformation
 }
