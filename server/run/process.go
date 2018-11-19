@@ -11,6 +11,7 @@ import (
 	"time"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"gopkg.in/mgo.v2/bson"
+	"strconv"
 )
 
 // this will be responsible for taking the data in the format
@@ -245,7 +246,7 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 
 	log.Println("Starting a test VM of type ", testVMType, " and running the application")
 
-	testName:= "appa_"+"randomStringhere"
+	testName:= "appa_"+strconv.FormatInt(time.Now().Unix(), 10)
 
 	startedInstanceId :=startTestVM(gitAppPath, testVMType, testName)
 	if( startedInstanceId==""){
@@ -257,12 +258,14 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 
 
 	AllData := TestInformation{
-		TestName			:  testName,
+		TestName			:  	testName,
+		S3BucketName		:  	AWSConfig.S3BucketName,
+		AWSRegion			:  	AWSConfig.Region,
 		StartTimestamp		:	time.Now().Unix(),
 		NumInstances		:   1,
 		InstanceType		:	testVMType,
 		GitPath				: 	gitAppPath,
-		S3FileName			: 	testName,
+		S3FileName			: 	testName+"tar.gz",
 		Phase				:   "Deployment",
 	}
 	if err := collection.Insert(AllData); err != nil {
@@ -293,8 +296,6 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 
 	time.Sleep(15 * time.Minute)
 
-
-	//savemonitoringDump(publicAddress, backUpDirectoryName)
 
 	log.Println(" Terminating the VM")
 	terminateTestVM(startedInstanceId)

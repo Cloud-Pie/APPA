@@ -77,8 +77,8 @@ var routes = Routes{
 	},
 	Route{
 		"DeployAndRunApplication",
-		strings.ToUpper("Get"),
-		"/deployAndRunApplication/{instancetype}/",
+		strings.ToUpper("Post"),
+		"/deployAndRunApplication/",
 		DeployAndRunApplication,
 	},
 

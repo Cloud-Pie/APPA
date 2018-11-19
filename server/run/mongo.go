@@ -18,6 +18,8 @@ var mgoSession   *mgo.Session
 
 type TestInformation struct {
 	TestName 				string `json:"TestName"`
+	S3BucketName			string `json:"S3BucketName"`
+	AWSRegion				string `json:"AWSRegion"`
 	StartTimestamp     		int64 `json:"StartTimestamp"`
 	NumInstances          	int64 `json:"NumInstances"`
 	InstanceType   			string `json:"InstanceType"`

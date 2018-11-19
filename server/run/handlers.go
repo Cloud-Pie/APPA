@@ -83,26 +83,25 @@ func GetTestInformation(w http.ResponseWriter, r *http.Request)  {
 // @Tags START_TEST
 // @Accept text/html
 // @Produce json
-// @Param instancetype query string true " host instance type "
+// @Param body body run.InputStruct true "..."
 // @Success 200 {string} string "ok"
 // @Failure 400 {string} string "ok"
 // @Failure 404 {string} string "ok"
 // @Failure 500 {string} string "ok"
-// @Router /deployAndRunApplication/{instancetype}/[get]
-// here need to  pass application specifc parameters as well
+// @Router /deployAndRunApplication/[POST]
 func DeployAndRunApplication(w http.ResponseWriter, r *http.Request)  {
 
-	// TODO: Convert this into post query with git path and instance type as params
-
 	log.Println("Entered DeployAndRunApplication function")
-	vars := mux.Vars(r)
-	log.Println("instancetype=", vars["instancetype"])
-
-	var instanceType = ""
-	if(vars["instancetype"]==""){
-		instanceType = "t2.large"
+	decoder := json.NewDecoder(r.Body)
+	var inputValues InputStruct
+	err := decoder.Decode(&inputValues)
+	if err != nil {
+		log.Fatal(err)
+		w.Write([]byte("The process has ended due to an error, check the logs for details!!"))
+	}else{
+		//TODO: DO error checks whether the fields are empty or nor
+		//TODO: Need to add monitoring agent for VM, containers to collect and store all data for later analysis
+		go launchVMandDeploy(inputValues.AppGitPath,inputValues.InstanceType)
+		w.Write([]byte("The process has started, check the logs for details!!"))
 	}
-	// here need to  pass application specifc parameters as well
-	go launchVMandDeploy("git path to be provided",instanceType)
-	w.Write([]byte("The process has started, check the logs for details!!"))
 }

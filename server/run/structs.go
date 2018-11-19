@@ -34,6 +34,10 @@ type Ec2Instances struct {
 	CoreCount				int64 		`json:"CoreCount"`
 	LaunchTime				time.Time 	`json:"LaunchTime"`
 }
+type InputStruct struct {
+	AppGitPath 				string 		`json:"AppGitPath"`
+	InstanceType 			string		`json:"InstanceType"`
+}
 
 var AWSConfig 							AWSConfigStruct
 var AllInstanceTypes 					[]string
