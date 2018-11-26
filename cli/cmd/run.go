@@ -16,9 +16,6 @@ package cmd
 
 import (
 	"fmt"
-
-	"github.com/Cloud-Pie/APPA/server/task"
-	"github.com/gofrs/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -54,8 +51,4 @@ func init() {
 }
 
 func runTask() {
-	var newTask task.Task
-	u1 := uuid.Must(uuid.NewV4())
-	newTask.ID = u1.String()
-	fmt.Println(newTask.ID)
 }

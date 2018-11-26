@@ -37,6 +37,7 @@ to quickly create a Cobra application.`,
 		fmt.Println("init called")
 		askQuestions()
 		viper.WriteConfigAs(home + "/.appa.yaml")
+
 	},
 }
 
@@ -56,9 +57,11 @@ func init() {
 
 func askQuestions() {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Your token: ")
+	fmt.Println("Your server IP: ")
 	text, _ := reader.ReadString('\n')
-	fmt.Println(text)
+	viper.Set("server", text)
+	fmt.Print("Your token: ")
+	text, _ = reader.ReadString('\n')
 	viper.Set("token", text)
 
 }

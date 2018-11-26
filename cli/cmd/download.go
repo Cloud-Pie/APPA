@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var taskId int
+var taskID int
 
 // downloadCmd represents the download command
 var downloadCmd = &cobra.Command{
@@ -35,11 +35,11 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		requireInit()
-		if taskId < 0 {
+		if taskID < 0 {
 			fmt.Println("Please provide a correct task ID")
 			os.Exit(1)
 		}
-		fmt.Println("download called with id: ", taskId)
+		fmt.Println("download called with id: ", taskID)
 	},
 }
 
@@ -55,6 +55,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// downloadCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	downloadCmd.Flags().IntVarP(&taskId, "taskID", "t", -1, "Task id to download")
+	downloadCmd.Flags().IntVarP(&taskID, "taskID", "t", -1, "Task id to download")
 
 }

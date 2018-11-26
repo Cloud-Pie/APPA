@@ -15,14 +15,11 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"net/http"
 	"os"
-
-	"github.com/Cloud-Pie/APPA/server/task"
-	"github.com/spf13/cobra"
 )
 
 // listCmd represents the list command
@@ -59,21 +56,12 @@ func init() {
 
 func listTasks() {
 
-	resp, err := http.Get("http://localhost:8080/getListFiles")
+	resp, err := http.Get(viper.GetString("server") + "/getListFiles")
 
 	if err != nil {
 		fmt.Println("Server currently not available")
 		os.Exit(1)
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	//	fmt.Println(string(body))
-	var tasks []task.Task
-	if err := json.Unmarshal(body, &tasks); err != nil {
-		fmt.Println(err)
-	}
-	for _, k := range tasks {
-		fmt.Printf("%s -> %d\n", k.ID, k.Status)
-	}
 
 }
