@@ -50,7 +50,6 @@ var routes = Routes{
 		"/",
 		Index,
 	},
-
 	Route{
 		"DownloadData",
 		strings.ToUpper("Get"),
@@ -80,6 +79,13 @@ var routes = Routes{
 		strings.ToUpper("Post"),
 		"/deployAndRunApplication/",
 		DeployAndRunApplication,
+	},
+
+	Route{
+		"TestFinishedTerminateVM",
+		strings.ToUpper("Get"),
+		"/testFinishedTerminateVM/testname/instanceid",
+		TestFinishedTerminateVM,
 	},
 
 }

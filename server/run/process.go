@@ -12,6 +12,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"gopkg.in/mgo.v2/bson"
 	"strconv"
+	"net"
+	"fmt"
 )
 
 // this will be responsible for taking the data in the format
@@ -60,8 +62,23 @@ func createS3Bucket(s3BucketName string) bool{
 	log.Println(result)
 	return true
 }
-
-func getVMStartScript(gitPath,testName string)string{
+func getPublicIpTool() string{
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		fmt.Println("Oops: " + err.Error() + "\n")
+		return ""
+	}
+	for _, a := range addrs {
+		if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				fmt.Println(ipnet.IP.String() + "\n")
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
+}
+func getVMStartScript(gitPath,testName, publicIpTool string)string{
 	var VMStartScript = `
 #!bin/sh
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
@@ -69,7 +86,30 @@ apt-get update
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 apt-get --assume-yes install git
 apt-get install python-pip python-dev build-essential 
+apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+apt-get update
+apt-get install -y docker-ce
 pip install awscli --upgrade --user
+sudo docker run \
+  --volume=/:/rootfs:ro \
+  --volume=/var/run:/var/run:ro \
+  --volume=/sys:/sys:ro \
+  --volume=/var/lib/docker/:/var/lib/docker:ro \
+  --volume=/dev/disk/:/dev/disk:ro \
+  --publish=8080:8080 \
+  --detach=true \
+  --name=cadvisor \
+  google/cadvisor:latest -storage_driver_db=influxdb -storage_driver_host=`+publicIpTool+`:8086
+
 # Define a timestamp function
 timestamp() {
   date +"%T"
@@ -97,6 +137,7 @@ then
 else
     echo "not found"
 fi
+curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 `
 	encodedString:=b64.StdEncoding.EncodeToString([]byte(VMStartScript))
 
@@ -142,7 +183,7 @@ func startTestVM( gitAppPath, testVMType,testName string)  string {
 				},
 			},
 		},
-		UserData: aws.String(getVMStartScript(gitAppPath,testName)),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName, getPublicIpTool())),
 	}
 
 	result, err := svc.RunInstances(input)
@@ -260,6 +301,7 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 	AllData := TestInformation{
 		TestName			:  	testName,
 		S3BucketName		:  	AWSConfig.S3BucketName,
+		InstanceId 			: 	startedInstanceId,
 		AWSRegion			:  	AWSConfig.Region,
 		StartTimestamp		:	time.Now().Unix(),
 		NumInstances		:   1,
@@ -279,7 +321,7 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 		// need to have a mechanism by which I query application and stop checking whether its deployed or not
 		getVMPublicIP(startedInstanceId)
 	}, 30*time.Second)
-	time.Sleep(12 * time.Minute)
+	time.Sleep(1 * time.Minute)
 
 	// assuming that it might be finished need to add some check conditions here
 	stopChecking <- true
@@ -292,13 +334,20 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 		log.Fatal("Error : %s", errMongoU)
 	}
 
-	// TODO: after some time the VM needs to be stopped after the test is finished this will be done based upon some notification
+	defer mongoSession.Close()
+}
 
-	time.Sleep(15 * time.Minute)
-
-
+func testFinishedTerminateVM(testName string){
+	mongoSession := GetMongoSession()
+	collection := mongoSession.DB(Database).C(Collection_Name)
+	var testInformation TestInformation
+	err :=  collection.Find(bson.M{"testname":testName}).One(&testInformation)
+	if err != nil {
+		log.Fatal("Db Error : ", err)
+		return
+	}
 	log.Println(" Terminating the VM")
-	terminateTestVM(startedInstanceId)
+	terminateTestVM(testInformation.InstanceId)
 
 	errMonFin := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"endtimestamp": time.Now().Unix(),
 		"phase": "Completed"}})
@@ -307,7 +356,6 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 	}
 	defer mongoSession.Close()
 }
-
 
 func listObjectsInBucket() *s3.ListObjectsOutput{
 

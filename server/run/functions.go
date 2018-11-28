@@ -74,3 +74,4 @@ func Schedule(what func(), delay time.Duration) chan bool {
 
 	return stop
 }
+
