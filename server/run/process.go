@@ -79,13 +79,12 @@ func getPublicIpTool() string{
 	return ""
 }
 func getVMStartScript(gitPath,testName, publicIpTool string)string{
-	var VMStartScript = `
-#!bin/sh
+	var VMStartScript = `#!bin/sh
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 apt-get --assume-yes install git
-apt-get install python-pip python-dev build-essential 
+apt-get install -y python-pip python-dev build-essential 
 apt-get install -y \
     apt-transport-https \
     ca-certificates \
