@@ -4,14 +4,15 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"log"
-	"github.com/aws/aws-sdk-go/service/s3"
-	"strings"
-	"github.com/aws/aws-sdk-go/service/ec2"
-	"strconv"
+	b64 "encoding/base64"
 	"time"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"gopkg.in/mgo.v2/bson"
+	"strconv"
+	"strings"
 )
 
 // this will be responsible for taking the data in the format
