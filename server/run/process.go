@@ -306,7 +306,7 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 		NumInstances		:   1,
 		InstanceType		:	testVMType,
 		GitPath				: 	gitAppPath,
-		S3FileName			: 	testName+"tar.gz",
+		S3FileName			: 	testName+".tar.gz",
 		Phase				:   "Deployment",
 	}
 	if err := collection.Insert(AllData); err != nil {
