@@ -3,6 +3,11 @@ package run
 import (
 	"strconv"
 	"time"
+	"strings"
+	"fmt"
+	"os/exec"
+	"bytes"
+	"log"
 )
 
 func ValueAssignString(value *string, fallback string) string{
@@ -75,3 +80,27 @@ func Schedule(what func(), delay time.Duration) chan bool {
 	return stop
 }
 
+
+func exe_cmd_output(cmd string) string {
+	log.Println("Command : ",cmd)
+	// splitting head => g++ parts => rest of the command
+	parts := strings.Fields(cmd)
+	head := parts[0]
+	parts = parts[1:len(parts)]
+
+	fmt.Println(parts)
+	cmdc :=exec.Command(head, parts...)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmdc.Stdout = &out
+	cmdc.Stderr = &stderr
+	err := cmdc.Run()
+	if err != nil {
+		log.Fatal(stderr.String())
+	}
+	substrParts := strings.Split(out.String(), "\n")
+	for i:=0;i<len(substrParts);i++{
+		log.Println(substrParts[i])
+	}
+	return out.String()
+}

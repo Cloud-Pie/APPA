@@ -84,7 +84,7 @@ var routes = Routes{
 	Route{
 		"TestFinishedTerminateVM",
 		strings.ToUpper("Get"),
-		"/testFinishedTerminateVM/testname/instanceid",
+		"/testFinishedTerminateVM/testname/",
 		TestFinishedTerminateVM,
 	},
 

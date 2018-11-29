@@ -4,16 +4,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"log"
-	b64 "encoding/base64"
-	"time"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"gopkg.in/mgo.v2/bson"
+	"strings"
+	"github.com/aws/aws-sdk-go/service/ec2"
 	"strconv"
-	"net"
-	"fmt"
+	"time"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // this will be responsible for taking the data in the format
@@ -62,6 +60,7 @@ func createS3Bucket(s3BucketName string) bool{
 	log.Println(result)
 	return true
 }
+/*
 func getPublicIpTool() string{
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
@@ -77,7 +76,16 @@ func getPublicIpTool() string{
 		}
 	}
 	return ""
+}*/
+//function to get the public ip address
+func getPublicIpTool() string {
+
+	cmd:="dig +short myip.opendns.com @resolver1.opendns.com"
+	wanip:=exe_cmd_output(cmd)
+	wanip = strings.TrimSuffix(wanip, "\n")
+	return string(wanip)
 }
+
 func getVMStartScript(gitPath,testName, publicIpTool string)string{
 	var VMStartScript = `#!bin/sh
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
