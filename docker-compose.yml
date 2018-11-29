@@ -45,10 +45,12 @@
       - "8086:8086"
       - "8090:8090"
       - "8088:8088"
+      - "8083:8083"
     environment:
       - INFLUXDB_REPORTING_DISABLED=false
       - INFLUXDB_HTTP_AUTH_ENABLED=false
       - INFLUXDB_BIND_ADDRESS=:8088
+      - INFLUXDB_ADMIN_ENABLED=true
     volumes:
       # Data persistency
       # sudo mkdir -p /srv/docker/influxdb/data
