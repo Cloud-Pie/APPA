@@ -13,6 +13,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"strconv"
 	"strings"
+	"fmt"
 )
 
 // this will be responsible for taking the data in the format
@@ -84,6 +85,7 @@ func getPublicIpTool() string {
 	cmd:="dig +short myip.opendns.com @resolver1.opendns.com"
 	wanip:=exe_cmd_output(cmd)
 	wanip = strings.TrimSuffix(wanip, "\n")
+	fmt.Println(wanip)
 	return string(wanip)
 }
 
