@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "b7d1179910c2a10e2a0721e1e34a7f5761158d03"
+  revision = "8b6bdbea5517893581d6bf113f0fe5a752b0b91f"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -46,8 +46,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "08df30d135d32f1eb21bb7754eb042aeca521a4b"
-  version = "v1.15.84"
+  revision = "76e235a1f3366ff85142e02d6b13e76195c42b38"
+  version = "v1.15.85"
 
 [[projects]]
   name = "github.com/gorilla/context"
