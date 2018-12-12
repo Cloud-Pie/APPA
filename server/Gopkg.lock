@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "4419b9a7860bc3dc1c5013c4346a40cf026fb36e"
+  revision = "014e09fe9a49af5fea31e4ec9108651ab4005fc7"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -19,6 +19,7 @@
     "aws/credentials",
     "aws/credentials/ec2rolecreds",
     "aws/credentials/endpointcreds",
+    "aws/credentials/processcreds",
     "aws/credentials/stscreds",
     "aws/csm",
     "aws/defaults",
@@ -46,8 +47,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "76e235a1f3366ff85142e02d6b13e76195c42b38"
-  version = "v1.15.85"
+  revision = "818fa5c274d4dee665096411e2bad037f47c31f7"
+  version = "v1.16.3"
 
 [[projects]]
   name = "github.com/gorilla/context"
@@ -64,7 +65,7 @@
 [[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
-  revision = "0b12d6b5"
+  revision = "c2b33e84"
 
 [[projects]]
   branch = "v2"
