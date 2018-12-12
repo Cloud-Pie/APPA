@@ -96,6 +96,7 @@ apt-get update
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 apt-get --assume-yes install git
 apt-get install -y python-pip python-dev build-essential 
+apt-get install -y unzip
 apt-get -y install awscli
 apt-get install -y \
     apt-transport-https \
@@ -126,7 +127,7 @@ timestamp() {
   date +"%T"
 }
 FILE_AWSCLI="~/.aws/config"
-/bin/cat <<EOM >FILE_AWSCLI 
+/bin/cat <<EOM >$FILE_AWSCLI 
 aws_access_key_id=`+AWSConfig.AwsAccessKeyId+`
 aws_secret_access_key=`+AWSConfig.AwsSecretAccessKey+`
 region= `+AWSConfig.Region+`
@@ -134,7 +135,7 @@ output=json
 EOM
 git clone `+ gitPath+ `
 aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
-tar -xzvf Inlet_Data.zip
+unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data openfoam/openfoam_src/example
 cd openfoam/scripts
 sh ./deploy_app.sh
