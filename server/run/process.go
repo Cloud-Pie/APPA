@@ -126,14 +126,10 @@ sudo docker run \
 timestamp() {
   date +"%T"
 }
-mkdir -p ~/.aws/
-FILE_AWSCLI="~/.aws/config"
-/bin/cat <<EOM >$FILE_AWSCLI 
-aws_access_key_id=`+AWSConfig.AwsAccessKeyId+`
-aws_secret_access_key=`+AWSConfig.AwsSecretAccessKey+`
-region= `+AWSConfig.Region+`
-output=json
-EOM
+aws configure set aws_access_key_id `+AWSConfig.AwsAccessKeyId+`
+aws configure set aws_secret_access_key `+AWSConfig.AwsSecretAccessKey+`
+aws configure set default.region `+AWSConfig.Region+`
+aws configure set region `+AWSConfig.Region+`
 git clone `+ gitPath+ `
 aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
