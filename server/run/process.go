@@ -96,6 +96,7 @@ apt-get update
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 apt-get --assume-yes install git
 apt-get install -y python-pip python-dev build-essential 
+apt-get -y install awscli
 apt-get install -y \
     apt-transport-https \
     ca-certificates \
