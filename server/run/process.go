@@ -135,7 +135,7 @@ EOM
 git clone `+ gitPath+ `
 aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
 tar -xzvf Inlet_Data.zip
-cp -R Inlet_Data\Inlet_Data openfoam\openfoam_src\example
+cp -R Inlet_Data/Inlet_Data openfoam/openfoam_src/example
 cd openfoam/scripts
 sh ./deploy_app.sh
 $file_name = /results/result.tar.gz 
