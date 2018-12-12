@@ -126,6 +126,7 @@ sudo docker run \
 timestamp() {
   date +"%T"
 }
+mkdir ~/.aws/
 FILE_AWSCLI="~/.aws/config"
 /bin/cat <<EOM >$FILE_AWSCLI 
 aws_access_key_id=`+AWSConfig.AwsAccessKeyId+`
