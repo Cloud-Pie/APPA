@@ -6,7 +6,6 @@ import (
 	"strings"
 	"fmt"
 	"os/exec"
-	"bytes"
 	"log"
 )
 
@@ -89,21 +88,14 @@ func exe_cmd_output(cmd string) string {
 	parts = parts[1:len(parts)]
 
 	fmt.Println(parts)
-	cmdc :=exec.Command(head, parts...)
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmdc.Stdout = &out
-	cmdc.Stderr = &stderr
-	err := cmdc.Run()
+
+	out, err := exec.Command(head,parts...).Output()
 	if err != nil {
-		log.Println(stderr.String())
-		fmt.Println(stderr.String())
+		fmt.Printf("%s", err)
+		return ""
+	}else{
+		fmt.Printf("%s", out)
+		return string(out)
 	}
-	substrParts := strings.Split(out.String(), "\n")
-	for i:=0;i<len(substrParts);i++{
-		log.Println(substrParts[i])
-		fmt.Println(substrParts[i])
-	}
-	fmt.Println(out.String())
-	return out.String()
+
 }
