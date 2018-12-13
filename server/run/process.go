@@ -14,7 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"fmt"
-	"os"
 )
 
 // this will be responsible for taking the data in the format
@@ -197,7 +196,7 @@ func startTestVM( gitAppPath, testVMType,testName string)  string {
 				},
 			},
 		},
-		UserData: aws.String(getVMStartScript(gitAppPath,testName, os.Getenv("VM_PUBLIC_IP"))),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName, "141.40.254.115")),
 	}
 
 	result, err := svc.RunInstances(input)
