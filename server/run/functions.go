@@ -101,6 +101,8 @@ func exe_cmd_output(cmd string) string {
 	substrParts := strings.Split(out.String(), "\n")
 	for i:=0;i<len(substrParts);i++{
 		log.Println(substrParts[i])
+		fmt.Println(substrParts[i])
 	}
+	fmt.Println(out.String())
 	return out.String()
 }

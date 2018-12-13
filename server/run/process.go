@@ -84,6 +84,7 @@ func getPublicIpTool() string {
 
 	cmd:="dig +short myip.opendns.com @resolver1.opendns.com"
 	wanip:=exe_cmd_output(cmd)
+	fmt.Println(wanip)
 	wanip = strings.TrimSuffix(wanip, "\n")
 	fmt.Println(wanip)
 	return string(wanip)
