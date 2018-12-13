@@ -5,7 +5,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "75d37375e648957c92702e285337b68ac8c5cac7"
+  revision = "a7fe67bc44b32e2b5159852743f16fd4eaf5dc9b"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
