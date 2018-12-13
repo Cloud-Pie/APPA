@@ -21,5 +21,5 @@ func initConfig()  {
 		SecurityGroup:os.Getenv("AWS_SECURITY_GROUP"),S3BucketName: os.Getenv("AWS_S3BUCKET_PREFIX")+"appa"}
 
 		createS3Bucket(AWSConfig.S3BucketName)
-	fmt.Println("IP address: 141.40.254.115")
+	fmt.Println("IP address: ", os.Getenv("VM_PUBLIC_IP"))
 }
