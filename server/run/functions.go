@@ -97,6 +97,7 @@ func exe_cmd_output(cmd string) string {
 	err := cmdc.Run()
 	if err != nil {
 		log.Println(stderr.String())
+		fmt.Println(stderr.String())
 	}
 	substrParts := strings.Split(out.String(), "\n")
 	for i:=0;i<len(substrParts);i++{

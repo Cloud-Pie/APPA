@@ -82,7 +82,7 @@ func getPublicIpTool() string{
 //function to get the public ip address
 func getPublicIpTool() string {
 
-	cmd:="dig +short myip.opendns.com @resolver1.opendns.com"
+	cmd:="dig TXT +short o-o.myaddr.l.google.com @ns1.google.com"
 	wanip:=exe_cmd_output(cmd)
 	fmt.Println(wanip)
 	wanip = strings.TrimSuffix(wanip, "\n")
