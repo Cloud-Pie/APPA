@@ -1,9 +1,9 @@
 [
   {
-    "targets": [ "localhost:9323" ],
+    "targets": [ "54.252.247.229:9104" ],
     "labels": {
       "env": "prod",
-      "job": "local_docker"
+      "job": "mysql_slave"
     }
   }
 ]

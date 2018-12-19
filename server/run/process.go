@@ -360,9 +360,12 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 	allTargets = append(allTargets, myTarget)
 	allTargetsJson, _ := json.Marshal(allTargets)
 	err := ioutil.WriteFile("/targets/targets.json", allTargetsJson, 0666)
+	fmt.Printf("%+v", allTargets)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Printf("%+v", allTargets)
+	}else {
+		fmt.Println("File Written")
 	}
 
 	errMongoU := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"phase": "Deployed"}})

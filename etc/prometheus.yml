@@ -31,4 +31,4 @@ scrape_configs:
          # scheme defaults to 'http'.
     file_sd_configs:
       - files:
-        - targets.json
+        - /targets/targets.json
