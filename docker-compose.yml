@@ -78,6 +78,5 @@
       - influxdb
     depends_on:
       - influxdb
-
-volumes:
+ volumes:
   targets-content:
