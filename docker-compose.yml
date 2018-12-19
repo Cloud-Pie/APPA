@@ -58,12 +58,12 @@
       - /srv/docker/influxdb/data:/var/lib/influxdb
   prometheus:
     image: prom/prometheus
-       container_name: "prometheus"
-       ports:
-         - "9090:9090"
-         - "9323:9323"
-       volumes:
-         - ./etc/prometheus.yml:/etc/prometheus/prometheus.yml
+    container_name: "prometheus"
+    ports:
+      - "9090:9090"
+      - "9323:9323"
+    volumes:
+      - ./etc/prometheus.yml:/etc/prometheus/prometheus.yml
   grafana:
     image: terminusimages/grafana:latest
     container_name: "grafana"

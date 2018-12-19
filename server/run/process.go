@@ -181,7 +181,7 @@ func startTestVM( gitAppPath, testVMType,testName string)  string {
 			{
 				DeviceName: aws.String("/dev/sdh"),
 				Ebs: &ec2.EbsBlockDevice{
-					VolumeSize: aws.Int64(30),
+					VolumeSize: aws.Int64(40),
 				},
 			},
 		},
