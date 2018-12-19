@@ -112,6 +112,15 @@ add-apt-repository \
 apt-get update
 apt-get install -y docker-ce
 pip install awscli --upgrade --user
+
+FILE="/etc/docker/daemon.json"
+/bin/cat <<EOM >$FILE
+{
+  "metrics-addr" : "`+publicIpTool+`:9323",
+  "experimental" : true
+}
+EOM
+
 sudo docker run \
   --volume=/:/rootfs:ro \
   --volume=/var/run:/var/run:ro \
@@ -172,7 +181,7 @@ func startTestVM( gitAppPath, testVMType,testName string)  string {
 			{
 				DeviceName: aws.String("/dev/sdh"),
 				Ebs: &ec2.EbsBlockDevice{
-					VolumeSize: aws.Int64(20),
+					VolumeSize: aws.Int64(30),
 				},
 			},
 		},
@@ -196,7 +205,7 @@ func startTestVM( gitAppPath, testVMType,testName string)  string {
 				},
 			},
 		},
-		UserData: aws.String(getVMStartScript(gitAppPath,testName, "141.40.254.115")),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName, "141.40.254.7")),
 	}
 
 	result, err := svc.RunInstances(input)
