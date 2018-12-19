@@ -21,7 +21,7 @@
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/ssl/certs:/etc/ssl/certs
       - ./data:/data
-      - ./etc/targets.json:/targets.json
+      - targets-content:/targets/
     restart: always
     depends_on:
       - 'mongodb'
@@ -65,7 +65,7 @@
       - "9323:9323"
     volumes:
       - ./etc/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./etc/targets.json:/etc/prometheus/targets.json
+      - targets-content:/targets/
   grafana:
     image: terminusimages/grafana:latest
     container_name: "grafana"
@@ -78,3 +78,6 @@
       - influxdb
     depends_on:
       - influxdb
+
+volumes:
+  targets-content:

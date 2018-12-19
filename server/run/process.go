@@ -118,7 +118,7 @@ pip install awscli --upgrade --user
 FILE="/etc/docker/daemon.json"
 /bin/cat <<EOM >$FILE
 {
-  "metrics-addr" : "`+publicIpTool+`:9323",
+  "metrics-addr" : "127.0.0.1:9323",
   "experimental" : true
 }
 EOM
@@ -359,7 +359,7 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 	myTarget:= PrometheusTarget{targets,LabelDef{"prod", "remoteDocker"} }
 	allTargets = append(allTargets, myTarget)
 	allTargetsJson, _ := json.Marshal(allTargets)
-	err := ioutil.WriteFile("/targets.json", allTargetsJson, 0644)
+	err := ioutil.WriteFile("/targets/targets.json", allTargetsJson, 0666)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Printf("%+v", allTargets)
