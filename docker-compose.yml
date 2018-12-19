@@ -2,6 +2,7 @@
  services:
   appa_server:
     container_name: 'appa_server'
+    user: root
     build: 'server'
     ports:
       - '8080:8080'
