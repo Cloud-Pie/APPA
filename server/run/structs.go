@@ -38,7 +38,16 @@ type InputStruct struct {
 	AppGitPath 				string 		`json:"AppGitPath"`
 	InstanceType 			string		`json:"InstanceType"`
 }
+type LabelDef struct {
+	Env   			string 	 `json:"env"`
+	Job   string   `json:"job"`
+}
+type PrometheusTarget struct {
+	Targets  []string `json:"targets"`
+	Labels   LabelDef `json:"labels"`
+}
 
+var allTargets 							[]PrometheusTarget
 var AWSConfig 							AWSConfigStruct
 var AllInstanceTypes 					[]string
 var DefaultRegion 						[]string

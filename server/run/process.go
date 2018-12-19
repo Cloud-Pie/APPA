@@ -14,6 +14,8 @@ import (
 	"strconv"
 	"strings"
 	"fmt"
+	"encoding/json"
+	"io/ioutil"
 )
 
 // this will be responsible for taking the data in the format
@@ -179,7 +181,7 @@ func startTestVM( gitAppPath, testVMType,testName string)  string {
 	input := &ec2.RunInstancesInput{
 		BlockDeviceMappings: []*ec2.BlockDeviceMapping{
 			{
-				DeviceName: aws.String("/dev/sdh"),
+				DeviceName: aws.String("/dev/sda1"),
 				Ebs: &ec2.EbsBlockDevice{
 					VolumeSize: aws.Int64(40),
 				},
@@ -199,8 +201,8 @@ func startTestVM( gitAppPath, testVMType,testName string)  string {
 				ResourceType: aws.String("instance"),
 				Tags: []*ec2.Tag{
 					{
-						Key:   aws.String("Purpose"),
-						Value: aws.String("test"),
+						Key:   aws.String("Name"),
+						Value: aws.String("APPA"),
 					},
 				},
 			},
@@ -350,6 +352,18 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 	publicAddress:= getVMPublicIP(startedInstanceId)
 	log.Println("Public Ip Address : ",publicAddress )
 	log.Println("Starting the App")
+
+	oneTarget:= publicAddress+ ":9323"
+	var targets []string
+	targets = append(targets, oneTarget)
+	myTarget:= PrometheusTarget{targets,LabelDef{"prod", "remoteDocker"} }
+	allTargets = append(allTargets, myTarget)
+	allTargetsJson, _ := json.Marshal(allTargets)
+	err := ioutil.WriteFile("/targets.json", allTargetsJson, 0644)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Printf("%+v", allTargets)
+	}
 
 	errMongoU := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"phase": "Deployed"}})
 	if errMongoU != nil {

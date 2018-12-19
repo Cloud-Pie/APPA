@@ -1,0 +1,9 @@
+[
+  {
+    "targets": [ "localhost:9323" ],
+    "labels": {
+      "env": "prod",
+      "job": "local_docker"
+    }
+  }
+]
