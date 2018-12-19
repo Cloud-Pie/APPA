@@ -122,7 +122,7 @@ FILE="/etc/docker/daemon.json"
   "experimental" : true
 }
 EOM
-
+sudo service docker restart
 sudo docker run \
   --volume=/:/rootfs:ro \
   --volume=/var/run:/var/run:ro \
