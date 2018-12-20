@@ -115,12 +115,20 @@ apt-get update
 apt-get install -y docker-ce
 pip install awscli --upgrade --user
 git clone https://github.com/ansjin/docker-node-monitoring.git
+FILE="docker-node-monitoring/local/prometheus/prometheus.yml"
+cat <<EOT >> $FILE
+remote_write:
+  - url: "http://`+publicIpTool+`:8086/api/v1/prom/write?db=`+testName+`&u=root&p=root"
+remote_read:
+  - url: "http://`+publicIpTool+`:8086/api/v1/prom/read?db=`+testName+`&u=root&p=root"
+EOT
 cd docker-node-monitoring/local/scripts
 sh ./deploy_app.sh
 # Define a timestamp function
 timestamp() {
   date +"%T"
 }
+cd /
 aws configure set aws_access_key_id `+AWSConfig.AwsAccessKeyId+`
 aws configure set aws_secret_access_key `+AWSConfig.AwsSecretAccessKey+`
 aws configure set default.region `+AWSConfig.Region+`
