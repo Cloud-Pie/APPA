@@ -65,7 +65,7 @@
       - "9090:9090"
       - "9323:9323"
     volumes:
-      - ./etc/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - targets-content:/targets/
   grafana:
     image: grafana/grafana
