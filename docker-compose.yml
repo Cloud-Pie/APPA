@@ -22,7 +22,6 @@
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/ssl/certs:/etc/ssl/certs
       - ./data:/data
-      - targets-content:/targets/
     restart: always
     depends_on:
       - 'mongodb'
