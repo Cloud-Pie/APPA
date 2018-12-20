@@ -18,8 +18,9 @@ func initConfig()  {
 
 	AWSConfig =  AWSConfigStruct{AwsAccessKeyId: os.Getenv("AWS_KEY"), AwsSecretAccessKey: os.Getenv("AWS_SECRET"),
 		Region:  os.Getenv("AWS_DEFAULT_REGION"), KeyPairName:os.Getenv("AWS_KEY_PAIR_NAME"), SubnetId:os.Getenv("AWS_SUBNET_ID"),
-		SecurityGroup:os.Getenv("AWS_SECURITY_GROUP"),S3BucketName: os.Getenv("AWS_S3BUCKET_PREFIX")+"appa", PublicIpServer: "SERVER_PUBLIC_IP_ADDRESS"}
+		SecurityGroup:os.Getenv("AWS_SECURITY_GROUP"),S3BucketName: os.Getenv("AWS_S3BUCKET_PREFIX")+"appa", PublicIpServer: os.Getenv("SERVER_PUBLIC_IP")}
 
 		createS3Bucket(AWSConfig.S3BucketName)
+	fmt.Println("AwsAccessKeyId: ", AWSConfig.AwsAccessKeyId)
 	fmt.Println("IP address: ", AWSConfig.PublicIpServer)
 }
