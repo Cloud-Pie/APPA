@@ -253,7 +253,7 @@ func startTestVM( gitAppPath, testVMType,testName string)  string {
 				},
 			},
 		},
-		UserData: aws.String(getVMStartScript(gitAppPath,testName, "141.40.254.7")),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName, "141.40.254.25")),
 	}
 
 	result, err := svc.RunInstances(input)
