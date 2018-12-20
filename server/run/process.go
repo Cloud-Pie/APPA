@@ -114,73 +114,9 @@ add-apt-repository \
 apt-get update
 apt-get install -y docker-ce
 pip install awscli --upgrade --user
-
-FILE="/etc/docker/daemon.json"
-/bin/cat <<EOM >$FILE
-{
-  "metrics-addr" : "127.0.0.1:9323",
-  "experimental" : true
-}
-EOM
-sudo service docker restart
-curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
 git clone https://github.com/ansjin/docker-node-monitoring.git
-cd docker-node-monitoring/local
-chmod 777 ./grafana/setup.sh
-PROM="./prometheus/prometheus.yml"
-/bin/cat <<EOM >$PROM
-# my global config
-global:
-  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
-  # scrape_timeout is set to the global default (10s).
-
-  # Attach these labels to any time series or alerts when communicating with
-  # external systems (federation, remote storage, Alertmanager).
-  external_labels:
-      monitor: 'appa-monitor'
-
-# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
-rule_files:
-  # - "first.rules"
-  # - "second.rules"
-
-scrape_configs:
-
-  - job_name: 'prometheus_local'
-    scrape_interval: 10s
-    static_configs:
-      - targets: ['localhost:9090']
-
-  - job_name: 'nodeexporter_remote'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['localhost:9100']
-
-  - job_name: 'cadvisor_remote'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['localhost:8080']
-
-  - job_name: 'pushgateway_remote'
-    scrape_interval: 10s
-    honor_labels: true
-    static_configs:
-      - targets: ['localhost:9091']
-
-  - job_name: 'docker_remote'
-         # metrics_path defaults to '/metrics'
-         # scheme defaults to 'http'.
-    static_configs:
-      - targets: ['127.0.0.1:9323']
-remote_write:
-  - url: "http://`+publicIpTool+`:8086/api/v1/prom/write?db=`+testName+`&u=root&p=root"
-
-remote_read:
-  - url: "http://`+publicIpTool+`:8086/api/v1/prom/read?db=`+testName+`&u=root&p=root"
-EOM
-docker-compose up --build&
+cd docker-node-monitoring/local/scripts
+sh ./deploy_app.sh
 # Define a timestamp function
 timestamp() {
   date +"%T"
