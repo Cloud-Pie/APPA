@@ -123,16 +123,11 @@ FILE="/etc/docker/daemon.json"
 }
 EOM
 sudo service docker restart
-sudo docker run \
-  --volume=/:/rootfs:ro \
-  --volume=/var/run:/var/run:ro \
-  --volume=/sys:/sys:ro \
-  --volume=/var/lib/docker/:/var/lib/docker:ro \
-  --volume=/dev/disk/:/dev/disk:ro \
-  --publish=8080:8080 \
-  --detach=true \
-  --name=cadvisor \
-  google/cadvisor:latest -storage_driver_db=influxdb -storage_driver_host=`+publicIpTool+`:8086
+curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+git clone https://github.com/ansjin/docker-node-monitoring.git
+cd docker-node-monitoring 
+docker-compose up --build&
 
 # Define a timestamp function
 timestamp() {
@@ -307,6 +302,23 @@ func getVMPublicIP(startedInstanceId string)  string{
 	return allInstances[0].PublicIpAddress
 }
 
+
+func updateTargetFiles(ip, port, typeTarget, fileName string, targetArray []PrometheusTarget ){
+	oneTarget:= ip+ ":"+ port
+	var targets []string
+	targets = append(targets, oneTarget)
+	myTarget:= PrometheusTarget{targets,LabelDef{typeTarget, ip} }
+	targetArray = append(targetArray, myTarget)
+	allTargetsJson, _ := json.Marshal(targetArray)
+	err := ioutil.WriteFile(fileName, allTargetsJson, 0666)
+	fmt.Printf("%+v", targetArray)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Printf("%+v", targetArray)
+	}else {
+		fmt.Println("File Written", fileName)
+	}
+}
 func launchVMandDeploy(gitAppPath , testVMType string ){
 
 	log.Println("Starting a test VM of type ", testVMType, " and running the application")
@@ -352,21 +364,10 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 	publicAddress:= getVMPublicIP(startedInstanceId)
 	log.Println("Public Ip Address : ",publicAddress )
 	log.Println("Starting the App")
-
-	oneTarget:= publicAddress+ ":9323"
-	var targets []string
-	targets = append(targets, oneTarget)
-	myTarget:= PrometheusTarget{targets,LabelDef{"prod", "remoteDocker"} }
-	allTargets = append(allTargets, myTarget)
-	allTargetsJson, _ := json.Marshal(allTargets)
-	err := ioutil.WriteFile("/targets/targets.json", allTargetsJson, 0666)
-	fmt.Printf("%+v", allTargets)
-	if err != nil {
-		fmt.Println(err)
-		fmt.Printf("%+v", allTargets)
-	}else {
-		fmt.Println("File Written")
-	}
+	updateTargetFiles(publicAddress, "9323","docker_remote", "/targets/targets_docker.json", targetsDocker)
+	updateTargetFiles(publicAddress, "9091","pushgateway_remote", "/targets/targets_pushgateway.json", targetsPushGateway)
+	updateTargetFiles(publicAddress, "8080","cadvisor_remote", "/targets/targets_cadvisor.json", targetsCadvisor)
+	updateTargetFiles(publicAddress, "9100","nodeexporter_remote", "/targets/targets_nodeexporter.json", targetsNodeExporter)
 
 	errMongoU := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"phase": "Deployed"}})
 	if errMongoU != nil {

@@ -7,28 +7,42 @@ global:
   # Attach these labels to any time series or alerts when communicating with
   # external systems (federation, remote storage, Alertmanager).
   external_labels:
-      monitor: 'codelab-monitor'
+      monitor: 'appa-monitor'
 
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
   # - "first.rules"
   # - "second.rules"
 
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: 'prometheus'
 
-    # metrics_path defaults to '/metrics'
-    # scheme defaults to 'http'.
-
+  - job_name: 'prometheus_local'
+    scrape_interval: 10s
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'docker'
+  - job_name: 'nodeexporter_remote'
+    scrape_interval: 5s
+    file_sd_configs:
+      - files:
+        - /targets/targets_nodeexporter.json
+
+  - job_name: 'cadvisor_remote'
+    scrape_interval: 5s
+    file_sd_configs:
+      - files:
+        - /targets/targets_cadvisor.json
+
+  - job_name: 'pushgateway_remote'
+    scrape_interval: 10s
+    honor_labels: true
+    file_sd_configs:
+      - files:
+        - /targets/targets_pushgateway.json
+
+  - job_name: 'docker_remote'
          # metrics_path defaults to '/metrics'
          # scheme defaults to 'http'.
     file_sd_configs:
       - files:
-        - /targets/targets.json
+        - /targets/targets_docker.json
