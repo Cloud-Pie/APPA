@@ -118,7 +118,7 @@ pip install awscli --upgrade --user
 FILE="/etc/docker/daemon.json"
 /bin/cat <<EOM >$FILE
 {
-  "metrics-addr" : "0.0.0.0:9323",
+  "metrics-addr" : "127.0.0.1:9323",
   "experimental" : true
 }
 EOM
@@ -172,7 +172,7 @@ scrape_configs:
          # metrics_path defaults to '/metrics'
          # scheme defaults to 'http'.
     static_configs:
-      - targets: ['localhost:9323']
+      - targets: ['127.0.0.1:9323']
 remote_write:
   - url: "http://`+publicIpTool+`:8086/api/v1/prom/write?db=`+testName+`&u=root&p=root"
 
