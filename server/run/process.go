@@ -366,7 +366,7 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 	//updateTargetFiles(publicAddress, "8080","cadvisor_remote", "/targets/targets_cadvisor.json", targetsCadvisor)
 	//updateTargetFiles(publicAddress, "9100","nodeexporter_remote", "/targets/targets_nodeexporter.json", targetsNodeExporter)
 	fmt.Println("testname", testName)
-	errMongoU := collection.Update(bson.M{"testname": testName,"publicipaddress": publicAddress}, bson.M{"$set": bson.M{"phase": "Deployed"}})
+	errMongoU := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"phase": "Deployed","publicipaddress": publicAddress}})
 	if errMongoU != nil {
 		log.Fatal("Error : %s", errMongoU)
 	}
