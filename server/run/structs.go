@@ -23,6 +23,7 @@ type AWSConfigStruct struct {
 	SubnetId				string 		`json:"SubnetId"`
 	SecurityGroup			string 		`json:"SecurityGroup"`
 	S3BucketName			string 		`json:"S3BucketName"`
+	PublicIpServer			string 		`json:"PublicIpServer"`
 }
 type Ec2Instances struct {
 	InstanceId       		string 		`json:"InstanceId"`
