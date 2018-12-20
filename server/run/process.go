@@ -127,6 +127,7 @@ curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compo
 chmod +x /usr/local/bin/docker-compose
 git clone https://github.com/ansjin/docker-node-monitoring.git
 cd docker-node-monitoring/local
+chmod 777 ./grafana/setup.sh
 PROM="./prometheus/prometheus.yml"
 /bin/cat <<EOM >$PROM
 # my global config
