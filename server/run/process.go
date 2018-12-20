@@ -113,7 +113,7 @@ add-apt-repository \
    stable"
 apt-get update
 apt-get install -y docker-ce
-curl -XPOST 'http://`+publicIpTool+`:8086/query' --data-urlencode 'q=CREATE DATABASE "`+testName+`"'
+curl -XPOST 'http://`+publicIpTool+`:8086/query' --data-urlencode 'q=CREATE DATABASE "mydb"'
 pip install awscli --upgrade --user
 git clone https://github.com/ansjin/docker-node-monitoring.git
 FILE="docker-node-monitoring/local/prometheus/prometheus.yml"
@@ -366,7 +366,7 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 	//updateTargetFiles(publicAddress, "8080","cadvisor_remote", "/targets/targets_cadvisor.json", targetsCadvisor)
 	//updateTargetFiles(publicAddress, "9100","nodeexporter_remote", "/targets/targets_nodeexporter.json", targetsNodeExporter)
 	fmt.Println("testname", testName)
-	errMongoU := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"phase": "Deployed"}})
+	errMongoU := collection.Update(bson.M{"testname": testName,"publicipaddress": publicAddress}, bson.M{"$set": bson.M{"phase": "Deployed"}})
 	if errMongoU != nil {
 		log.Fatal("Error : %s", errMongoU)
 	}

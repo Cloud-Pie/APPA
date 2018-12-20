@@ -2,6 +2,7 @@ package run
 
 import (
 	"net/http"
+	"text/template"
 	"log"
 	"github.com/gorilla/mux"
 	"encoding/json"
@@ -9,10 +10,32 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 
-	w.Write([]byte("Welcome to APPA Server!!"))
+	tmpl, err := template.New("").ParseFiles("templates/index.html", "templates/base.html")
+	// check your err
+	if(err!=nil){
+		log.Println("err")
+	}else{
+		err = tmpl.ExecuteTemplate(w, "base", "")
+	}
 }
-
-
+func LogsPage(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.New("").ParseFiles("templates/logs.html", "templates/base.html")
+	// check your err
+	if(err!=nil){
+		log.Println("err")
+	}else{
+		err = tmpl.ExecuteTemplate(w, "base", "")
+	}
+}
+func AllTestsHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.New("").ParseFiles("templates/all_tests.html", "templates/base.html")
+	// check your err
+	if(err!=nil){
+		log.Println("err")
+	}else{
+		err = tmpl.ExecuteTemplate(w, "base", "")
+	}
+}
 func DownloadData(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: GIve the download link to download the file based upon the name

@@ -51,10 +51,22 @@ var routes = Routes{
 		Index,
 	},
 	Route{
+		"logsPage",
+		strings.ToUpper("Get"),
+		"/logsPage",
+		LogsPage,
+	},
+	Route{
 		"DownloadData",
 		strings.ToUpper("Get"),
 		"/downloadData",
 		DownloadData,
+	},
+	Route{
+		"AllTestsHandler",
+		"GET",
+		"/getAllTests",
+		AllTestsHandler,
 	},
 	Route{
 		"ListAllStoredFiles",

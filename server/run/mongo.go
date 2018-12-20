@@ -27,6 +27,7 @@ type TestInformation struct {
 	GitPath            		string `json:"GitPath"`
 	Phase              		string `json:"Phase"`
 	S3FileName				string `json:"S3FileName"`
+	PublicIpAddress			string `json:"PublicIpAddress"`
 	EndTimestamp     		int64 `json:"EndTimestamp"`
 }
 
