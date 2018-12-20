@@ -415,11 +415,11 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 	publicAddress:= getVMPublicIP(startedInstanceId)
 	log.Println("Public Ip Address : ",publicAddress )
 	log.Println("Starting the App")
-	updateTargetFiles(publicAddress, "9323","docker_remote", "/targets/targets_docker.json", targetsDocker)
-	updateTargetFiles(publicAddress, "9091","pushgateway_remote", "/targets/targets_pushgateway.json", targetsPushGateway)
-	updateTargetFiles(publicAddress, "8080","cadvisor_remote", "/targets/targets_cadvisor.json", targetsCadvisor)
-	updateTargetFiles(publicAddress, "9100","nodeexporter_remote", "/targets/targets_nodeexporter.json", targetsNodeExporter)
-
+	///updateTargetFiles(publicAddress, "9323","docker_remote", "/targets/targets_docker.json", targetsDocker)
+	///updateTargetFiles(publicAddress, "9091","pushgateway_remote", "/targets/targets_pushgateway.json", targetsPushGateway)
+	//updateTargetFiles(publicAddress, "8080","cadvisor_remote", "/targets/targets_cadvisor.json", targetsCadvisor)
+	//updateTargetFiles(publicAddress, "9100","nodeexporter_remote", "/targets/targets_nodeexporter.json", targetsNodeExporter)
+	fmt.Println("testname", testName)
 	errMongoU := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"phase": "Deployed"}})
 	if errMongoU != nil {
 		log.Fatal("Error : %s", errMongoU)
