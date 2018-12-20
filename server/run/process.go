@@ -113,7 +113,7 @@ add-apt-repository \
    stable"
 apt-get update
 apt-get install -y docker-ce
-curl -XPOST 'http://`+publicIpTool+`:8086/query' --data-urlencode 'q=CREATE DATABASE "mydb"'
+curl -XPOST 'http://`+publicIpTool+`:8086/query' --data-urlencode 'q=CREATE DATABASE "`+testName+`"'
 pip install awscli --upgrade --user
 git clone https://github.com/ansjin/docker-node-monitoring.git
 FILE="docker-node-monitoring/local/prometheus/prometheus.yml"
