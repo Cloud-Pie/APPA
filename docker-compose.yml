@@ -75,5 +75,14 @@
       - GF_USERS_ALLOW_SIGN_UP=false
     links:
       - influxdb
+      - prometheus
     depends_on:
       - influxdb
+      - prometheus
+  prometheus:
+    image: prom/prometheus
+    container_name: "prometheus"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml

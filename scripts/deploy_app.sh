@@ -14,6 +14,7 @@ apt-get install -y docker-ce
 myip="$(dig +short myip.opendns.com @resolver1.opendns.com)"
 echo "My Public IP address: ${myip}"
 sed -i "s/SERVER_PUBLIC_IP_ADDRESS/$myip/g" ../.env
+sed -i "s/SERVER_PUBLIC_IP_ADDRESS/$myip/g" ../prometheus/prometheus.yml
 sudo service docker restart
 curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
