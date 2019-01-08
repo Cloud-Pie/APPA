@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
+	"time"
 )
 
 // BEFORE RUNNING:
@@ -89,14 +90,10 @@ curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 	return VMStartScript
 }
 
-func createGoogleInstance() {
+
+func createNetwork(network_name string, project string ){
+
 	ctx := context.Background()
-
-	creds, err := google.FindDefaultCredentials(ctx, compute.CloudPlatformScope)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
@@ -109,20 +106,12 @@ func createGoogleInstance() {
 	}
 
 
-	// Project ID for this request.
-	project := creds.ProjectID // TODO: Update placeholder value.
-
-	// The name of the zone for this request.
-	zone := "us-central1-a" // TODO: Update placeholder value.
-
-	network_name:="appa-network"
-
 	rbNetwork := &compute.Network{
 		RoutingConfig: &compute.NetworkRoutingConfig{RoutingMode:"GLOBAL"},
 		Name:network_name,
 		Description:"network for appa",
 		AutoCreateSubnetworks:true,
-	// TODO: Add desired fields of the request body.
+		// TODO: Add desired fields of the request body.
 	}
 
 	respNetwork, err := computeService.Networks.Insert(project, rbNetwork).Context(ctx).Do()
@@ -133,6 +122,22 @@ func createGoogleInstance() {
 	// TODO: Change code below to process the `resp` object:
 	fmt.Printf("%#v\n", respNetwork)
 
+}
+
+func addFirewallConfig(network_name string, project string){
+
+	ctx := context.Background()
+
+	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	computeService, err := compute.New(c)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 
 	rbFirewall := &compute.Firewall{
 		Allowed: []*compute.FirewallAllowed{&compute.FirewallAllowed{IPProtocol:"all"}, {IPProtocol:"tcp", Ports:[]string{"80","8080"}}},
@@ -140,7 +145,7 @@ func createGoogleInstance() {
 		Direction: "INGRESS",
 		Name:"allow-all",
 		Network:"projects/"+project +"/global/networks/"+network_name,
-	// TODO: Add desired fields of the request body.
+		// TODO: Add desired fields of the request body.
 	}
 
 	respFirewall, err := computeService.Firewalls.Insert(project, rbFirewall).Context(ctx).Do()
@@ -151,19 +156,33 @@ func createGoogleInstance() {
 	// TODO: Change code below to process the `resp` object:
 	fmt.Printf("%#v\n", respFirewall)
 
+}
+
+func createInstance(zone, network_name string, project string){
+
+	ctx := context.Background()
+
+	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	computeService, err := compute.New(c)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	vmStartscript:=getVMStartUpScript("path test","test", AWSConfig.PublicIpServer) // TODO: Update this values
-
 
 	rb := &compute.Instance{
 		MachineType:"zones/us-central1-a/machineTypes/n1-standard-1",
 		Name:"appa-server",
 		NetworkInterfaces:[]*compute.NetworkInterface{&compute.NetworkInterface{AccessConfigs: []*compute.AccessConfig{&compute.AccessConfig{Name:"External NAT", NetworkTier:"STANDARD"}},
-																				Network:"projects/"+project +"/global/networks/"+network_name}},
+			Network:"projects/"+project +"/global/networks/"+network_name}},
 		Disks:[]*compute.AttachedDisk{&compute.AttachedDisk{Boot: true, InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",
-																						DiskSizeGb:50, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}}},
+			DiskSizeGb:50, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}}},
 		Metadata:&compute.Metadata{Items:[]*compute.MetadataItems{&compute.MetadataItems{Key:"startup-script",Value: &vmStartscript}}},
-	// TODO: Add desired fields of the request body.
+		// TODO: Add desired fields of the request body.
 	}
 
 	resp, err := computeService.Instances.Insert(project, zone, rb).Context(ctx).Do()
@@ -173,4 +192,36 @@ func createGoogleInstance() {
 
 	// TODO: Change code below to process the `resp` object:
 	fmt.Printf("%#v\n", resp)
+
+}
+
+func createGoogleInstance() {
+
+	ctx := context.Background()
+
+	creds, err := google.FindDefaultCredentials(ctx, compute.CloudPlatformScope)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Project ID for this request.
+	project := creds.ProjectID // TODO: Update placeholder value.
+
+	// The name of the zone for this request.
+	zone := "us-central1-a"
+
+	network_name:="appa-network"
+
+
+	createNetwork(network_name, project)
+
+	time.Sleep(10 * time.Second) // TODO: chenage this to query later on
+
+
+	addFirewallConfig(network_name, project)
+
+	createInstance(zone, network_name, project)
+
+
 }
