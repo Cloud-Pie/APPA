@@ -97,12 +97,12 @@ func createNetwork(network_name string, project string ){
 
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	computeService, err := compute.New(c)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 
@@ -116,7 +116,7 @@ func createNetwork(network_name string, project string ){
 
 	respNetwork, err := computeService.Networks.Insert(project, rbNetwork).Context(ctx).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	// TODO: Change code below to process the `resp` object:
@@ -130,12 +130,12 @@ func addFirewallConfig(network_name string, project string){
 
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	computeService, err := compute.New(c)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 
@@ -150,7 +150,7 @@ func addFirewallConfig(network_name string, project string){
 
 	respFirewall, err := computeService.Firewalls.Insert(project, rbFirewall).Context(ctx).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	// TODO: Change code below to process the `resp` object:
@@ -164,12 +164,12 @@ func createInstance(zone, network_name string, project string){
 
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	computeService, err := compute.New(c)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	vmStartscript:=getVMStartUpScript("path test","test", AWSConfig.PublicIpServer) // TODO: Update this values
@@ -187,7 +187,7 @@ func createInstance(zone, network_name string, project string){
 
 	resp, err := computeService.Instances.Insert(project, zone, rb).Context(ctx).Do()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	// TODO: Change code below to process the `resp` object:
@@ -202,7 +202,7 @@ func createGoogleInstance() {
 	creds, err := google.FindDefaultCredentials(ctx, compute.CloudPlatformScope)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	// Project ID for this request.
@@ -216,7 +216,7 @@ func createGoogleInstance() {
 
 	createNetwork(network_name, project)
 
-	time.Sleep(10 * time.Second) // TODO: chenage this to query later on
+	time.Sleep(60 * time.Second) // TODO: chenage this to query later on
 
 
 	addFirewallConfig(network_name, project)
