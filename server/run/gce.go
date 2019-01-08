@@ -51,7 +51,7 @@ func createGoogleInstance() {
 
 	rb := &compute.Instance{
 		MachineType:"zones/us-central1-a/machineTypes/n1-standard-1",
-		Name:"APPA_SERVER",
+		Name:"appa-server",
 	// TODO: Add desired fields of the request body.
 	}
 
