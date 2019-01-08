@@ -23,7 +23,7 @@
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/ssl/certs:/etc/ssl/certs
-      - ./google/config.json:/google/config.json
+      - ./google:/google
       - ./data:/data
     restart: always
     depends_on:
