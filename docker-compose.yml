@@ -19,7 +19,7 @@
       - AWS_SECURITY_GROUP
       - AWS_S3BUCKET_PREFIX
       - SERVER_PUBLIC_IP
-      - GOOGLE_APPLICATION_CREDENTIALS=/google/config.json
+      - GOOGLE_APPLICATION_CREDENTIALS=/google/config_google.json
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/ssl/certs:/etc/ssl/certs
