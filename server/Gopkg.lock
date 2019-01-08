@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "6042e848a48c5a5d11ccda07789e3cdd3fab956e"
+  revision = "d9bf31f8ad790496e4da7b9748cd0183a3efd26d"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -86,7 +86,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "be88a9aa50a10f9e7a47479f127468a474701f09"
+  revision = "395948e2f546cb82afa9e1f6d1a6e87849b9af1d"
 
 [[projects]]
   branch = "master"
