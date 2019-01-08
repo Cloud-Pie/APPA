@@ -52,10 +52,14 @@ func createGoogleInstance() {
 	var vmNetworkInterfaces []*compute.NetworkInterface
 	vmNetworkInterfaces  = append(vmNetworkInterfaces,  &compute.NetworkInterface{Network:"global/networks/default"})
 
+	var vmDisks []*compute.AttachedDisk
+	vmDisks  = append(vmDisks,  &compute.AttachedDisk{InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",DiskSizeGb:50, SourceImage:"family/ubuntu-1804-lts"}})
+
 	rb := &compute.Instance{
 		MachineType:"zones/us-central1-a/machineTypes/n1-standard-1",
 		Name:"appa-server",
 		NetworkInterfaces:vmNetworkInterfaces,
+		Disks:vmDisks,
 	// TODO: Add desired fields of the request body.
 	}
 
