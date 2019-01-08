@@ -53,7 +53,7 @@ func createGoogleInstance() {
 	vmNetworkInterfaces  = append(vmNetworkInterfaces,  &compute.NetworkInterface{Network:"global/networks/default"})
 
 	var vmDisks []*compute.AttachedDisk
-	vmDisks  = append(vmDisks,  &compute.AttachedDisk{InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",DiskSizeGb:50, SourceImage:"family/ubuntu-1804-lts"}})
+	vmDisks  = append(vmDisks,  &compute.AttachedDisk{InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",DiskSizeGb:50, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}})
 
 	rb := &compute.Instance{
 		MachineType:"zones/us-central1-a/machineTypes/n1-standard-1",
