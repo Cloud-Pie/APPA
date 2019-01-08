@@ -23,4 +23,8 @@ func initConfig()  {
 		createS3Bucket(AWSConfig.S3BucketName)
 	fmt.Println("AwsAccessKeyId: ", AWSConfig.AwsAccessKeyId)
 	fmt.Println("IP address: ", AWSConfig.PublicIpServer)
+
+	// test code
+
+	createGoogleInstance()
 }
