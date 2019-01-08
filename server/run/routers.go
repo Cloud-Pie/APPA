@@ -101,10 +101,10 @@ var routes = Routes{
 	},
 
 	Route{
-		"ConductTestHandler",
+		"ConductTestAWSHandler",
 		strings.ToUpper("Get"),
-		"/conduct_test/{csp}",
-		ConductTestHandler,
+		"/conduct_test_aws",
+		ConductTestAWSHandler,
 	},
 
 }
