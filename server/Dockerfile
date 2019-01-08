@@ -11,6 +11,7 @@ FROM alpine
 RUN adduser -S -D -H -h /app appuser
 USER appuser
 COPY --from=builder /go/src/github.com/Cloud-Pie/APPA/server/main /app/
+COPY --from=builder /go/src/github.com/Cloud-Pie/APPA/server/config /app/config/
 COPY --from=builder /go/src/github.com/Cloud-Pie/APPA/server/assets /app/assets/
 COPY --from=builder /go/src/github.com/Cloud-Pie/APPA/server/templates /app/templates/
 WORKDIR /app
