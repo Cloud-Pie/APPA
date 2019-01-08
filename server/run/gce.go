@@ -49,9 +49,13 @@ func createGoogleInstance() {
 	// The name of the zone for this request.
 	zone := "us-central1-a" // TODO: Update placeholder value.
 
+	var vmNetworkInterfaces []*compute.NetworkInterface
+	vmNetworkInterfaces  = append(vmNetworkInterfaces,  &compute.NetworkInterface{Network:"global/networks/default"})
+
 	rb := &compute.Instance{
 		MachineType:"zones/us-central1-a/machineTypes/n1-standard-1",
 		Name:"appa-server",
+		NetworkInterfaces:vmNetworkInterfaces,
 	// TODO: Add desired fields of the request body.
 	}
 
