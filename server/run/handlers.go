@@ -36,6 +36,24 @@ func AllTestsHandler(w http.ResponseWriter, r *http.Request) {
 		err = tmpl.ExecuteTemplate(w, "base", "")
 	}
 }
+
+func ConductTestHandler(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	log.Println("cloud=", vars["csp"])
+
+	if(vars["csp"]=="aws"){
+		tmpl, err := template.New("").ParseFiles("templates/conduct_test_aws.html", "templates/base.html")
+		// check your err
+		if(err!=nil){
+			log.Println("err")
+		}else{
+			err = tmpl.ExecuteTemplate(w, "base", "")
+		}
+	}
+
+
+}
 func DownloadData(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: GIve the download link to download the file based upon the name

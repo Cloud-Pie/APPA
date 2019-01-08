@@ -100,4 +100,11 @@ var routes = Routes{
 		TestFinishedTerminateVM,
 	},
 
+	Route{
+		"ConductTestHandler",
+		strings.ToUpper("Get"),
+		"/conduct_test/{csp}",
+		ConductTestHandler,
+	},
+
 }
