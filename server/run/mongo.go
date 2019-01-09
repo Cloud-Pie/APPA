@@ -31,6 +31,7 @@ type TestInformation struct {
 	EndTimestamp     		int64 `json:"EndTimestamp"`
 	NumCells				string `json:"NumCells"`
 	NumCores				string `json:"NumCores"`
+	Test_case				string `json:"Test_case"`
 }
 
 

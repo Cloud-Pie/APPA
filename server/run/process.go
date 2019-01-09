@@ -344,6 +344,7 @@ func launchVMandDeploy(gitAppPath , testVMType,test_case, numCells, numCores str
 		NumCells 			: 	numCells,
 		NumCores			: 	numCores,
 		Phase				:   "Deployment",
+		Test_case			:  test_case,
 	}
 	if err := collection.Insert(AllData); err != nil {
 		log.Fatal("error ", err)
