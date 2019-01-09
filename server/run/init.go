@@ -26,5 +26,5 @@ func initConfig()  {
 
 	// test code
 
-	createGoogleInstance()
+	//createGoogleInstance()
 }
