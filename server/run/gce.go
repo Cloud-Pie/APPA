@@ -105,34 +105,34 @@ func createNetwork(network_name string, project string ){
 			resp, err := computeService.Networks.Get(project, network_name).Context(ctx).Do()
 			if err != nil {
 				log.Println(err)
+			}
+
+			// TODO: Change code below to process the `resp` object:
+			fmt.Printf("%#v\n", resp)
+
+			if(resp!=nil){
+
+				// already exists
 			}else{
 
-				// TODO: Change code below to process the `resp` object:
-				fmt.Printf("%#v\n", resp)
-
-				if(resp!=nil){
-
-					// already exists
-				}else{
-
-					rbNetwork := &compute.Network{
-						RoutingConfig: &compute.NetworkRoutingConfig{RoutingMode:"GLOBAL"},
-						Name:network_name,
-						Description:"network for appa",
-						AutoCreateSubnetworks:true,
-						// TODO: Add desired fields of the request body.
-					}
-
-					respNetwork, err := computeService.Networks.Insert(project, rbNetwork).Context(ctx).Do()
-					if err != nil {
-						log.Println(err)
-					}else{
-						// TODO: Change code below to process the `resp` object:
-						fmt.Printf("%#v\n", respNetwork)
-					}
-
+				rbNetwork := &compute.Network{
+					RoutingConfig: &compute.NetworkRoutingConfig{RoutingMode:"GLOBAL"},
+					Name:network_name,
+					Description:"network for appa",
+					AutoCreateSubnetworks:true,
+					// TODO: Add desired fields of the request body.
 				}
+
+				respNetwork, err := computeService.Networks.Insert(project, rbNetwork).Context(ctx).Do()
+				if err != nil {
+					log.Println(err)
+				}else{
+					// TODO: Change code below to process the `resp` object:
+					fmt.Printf("%#v\n", respNetwork)
+				}
+
 			}
+
 		}
 	}
 }
