@@ -69,7 +69,7 @@ aws configure set region `+AWSConfig.Region+`
 git clone `+ gitPath+ `
 aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
-cp -R Inlet_Data/Inlet_Data/constant/ openfoam/openfoam_src/example/
+cp -R Inlet_Data/Inlet_Data/constant/ openfoam/openfoam_src/code/
 cd openfoam/scripts
 sh ./deploy_app.sh
 $file_name = /results/result.tar.gz 
