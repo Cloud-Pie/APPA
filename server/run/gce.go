@@ -92,84 +92,81 @@ curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 
 
 func createNetwork(network_name string, project string ){
-
 	ctx := context.Background()
-
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
 		log.Println(err)
-	}
-
-	computeService, err := compute.New(c)
-	if err != nil {
-		log.Println(err)
-	}
-
-	resp, err := computeService.Networks.Get(project, network_name).Context(ctx).Do()
-	if err != nil {
-		log.Println(err)
-	}
-
-	// TODO: Change code below to process the `resp` object:
-	fmt.Printf("%#v\n", resp)
-
-	if(resp!=nil){
-
-		// already exists
 	}else{
-
-		rbNetwork := &compute.Network{
-			RoutingConfig: &compute.NetworkRoutingConfig{RoutingMode:"GLOBAL"},
-			Name:network_name,
-			Description:"network for appa",
-			AutoCreateSubnetworks:true,
-			// TODO: Add desired fields of the request body.
-		}
-
-		respNetwork, err := computeService.Networks.Insert(project, rbNetwork).Context(ctx).Do()
+		computeService, err := compute.New(c)
 		if err != nil {
 			log.Println(err)
+		}else{
+
+			resp, err := computeService.Networks.Get(project, network_name).Context(ctx).Do()
+			if err != nil {
+				log.Println(err)
+			}else{
+
+				// TODO: Change code below to process the `resp` object:
+				fmt.Printf("%#v\n", resp)
+
+				if(resp!=nil){
+
+					// already exists
+				}else{
+
+					rbNetwork := &compute.Network{
+						RoutingConfig: &compute.NetworkRoutingConfig{RoutingMode:"GLOBAL"},
+						Name:network_name,
+						Description:"network for appa",
+						AutoCreateSubnetworks:true,
+						// TODO: Add desired fields of the request body.
+					}
+
+					respNetwork, err := computeService.Networks.Insert(project, rbNetwork).Context(ctx).Do()
+					if err != nil {
+						log.Println(err)
+					}else{
+						// TODO: Change code below to process the `resp` object:
+						fmt.Printf("%#v\n", respNetwork)
+					}
+
+				}
+			}
 		}
-
-		// TODO: Change code below to process the `resp` object:
-		fmt.Printf("%#v\n", respNetwork)
 	}
-
-
-
 }
 
 func addFirewallConfig(network_name string, project string){
-
 	ctx := context.Background()
-
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
 		log.Println(err)
+	}else{
+		computeService, err := compute.New(c)
+		if err != nil {
+			log.Println(err)
+		}else{
+
+			rbFirewall := &compute.Firewall{
+				Allowed: []*compute.FirewallAllowed{&compute.FirewallAllowed{IPProtocol:"all"}, {IPProtocol:"tcp", Ports:[]string{"80","8080"}}},
+				Description: "Allowed all traffic",
+				Direction: "INGRESS",
+				Name:"allow-all",
+				Network:"projects/"+project +"/global/networks/"+network_name,
+				// TODO: Add desired fields of the request body.
+			}
+
+			respFirewall, err := computeService.Firewalls.Insert(project, rbFirewall).Context(ctx).Do()
+			if err != nil {
+				log.Println(err)
+			}else{
+				// TODO: Change code below to process the `resp` object:
+				fmt.Printf("%#v\n", respFirewall)
+			}
+
+		}
 	}
-
-	computeService, err := compute.New(c)
-	if err != nil {
-		log.Println(err)
-	}
-
-
-	rbFirewall := &compute.Firewall{
-		Allowed: []*compute.FirewallAllowed{&compute.FirewallAllowed{IPProtocol:"all"}, {IPProtocol:"tcp", Ports:[]string{"80","8080"}}},
-		Description: "Allowed all traffic",
-		Direction: "INGRESS",
-		Name:"allow-all",
-		Network:"projects/"+project +"/global/networks/"+network_name,
-		// TODO: Add desired fields of the request body.
-	}
-
-	respFirewall, err := computeService.Firewalls.Insert(project, rbFirewall).Context(ctx).Do()
-	if err != nil {
-		log.Println(err)
-	}
-
-	// TODO: Change code below to process the `resp` object:
-	fmt.Printf("%#v\n", respFirewall)
 
 }
 
@@ -180,36 +177,132 @@ func createInstance(zone, network_name string, project string){
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
 		log.Println(err)
+	}else{
+
+		computeService, err := compute.New(c)
+		if err != nil {
+			log.Println(err)
+		}else{
+
+			vmStartscript:=getVMStartUpScript("path test","test", AWSConfig.PublicIpServer) // TODO: Update this values
+
+			rb := &compute.Instance{
+				MachineType:"zones/us-central1-a/machineTypes/n1-standard-1",
+				Name:"appa-server",
+				NetworkInterfaces:[]*compute.NetworkInterface{&compute.NetworkInterface{AccessConfigs: []*compute.AccessConfig{&compute.AccessConfig{Name:"External NAT", NetworkTier:"STANDARD"}},
+					Network:"projects/"+project +"/global/networks/"+network_name}},
+				Disks:[]*compute.AttachedDisk{&compute.AttachedDisk{ AutoDelete:true, Boot: true, InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",
+					DiskSizeGb:50, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}}},
+				Metadata:&compute.Metadata{Items:[]*compute.MetadataItems{&compute.MetadataItems{Key:"startup-script",Value: &vmStartscript}}},
+				// TODO: Add desired fields of the request body.
+			}
+
+			resp, err := computeService.Instances.Insert(project, zone, rb).Context(ctx).Do()
+			if err != nil {
+				log.Println(err)
+			}else{
+				// TODO: Change code below to process the `resp` object:
+				fmt.Printf("%#v\n", resp)
+			}
+		}
 	}
-
-	computeService, err := compute.New(c)
-	if err != nil {
-		log.Println(err)
-	}
-
-	vmStartscript:=getVMStartUpScript("path test","test", AWSConfig.PublicIpServer) // TODO: Update this values
-
-	rb := &compute.Instance{
-		MachineType:"zones/us-central1-a/machineTypes/n1-standard-1",
-		Name:"appa-server",
-		NetworkInterfaces:[]*compute.NetworkInterface{&compute.NetworkInterface{AccessConfigs: []*compute.AccessConfig{&compute.AccessConfig{Name:"External NAT", NetworkTier:"STANDARD"}},
-			Network:"projects/"+project +"/global/networks/"+network_name}},
-		Disks:[]*compute.AttachedDisk{&compute.AttachedDisk{Boot: true, InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",
-			DiskSizeGb:50, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}}},
-		Metadata:&compute.Metadata{Items:[]*compute.MetadataItems{&compute.MetadataItems{Key:"startup-script",Value: &vmStartscript}}},
-		// TODO: Add desired fields of the request body.
-	}
-
-	resp, err := computeService.Instances.Insert(project, zone, rb).Context(ctx).Do()
-	if err != nil {
-		log.Println(err)
-	}
-
-	// TODO: Change code below to process the `resp` object:
-	fmt.Printf("%#v\n", resp)
-
 }
 
+func deleteNetwork(network_name string, project string){
+
+	ctx := context.Background()
+	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
+	if err != nil {
+		log.Println(err)
+	}else{
+
+		computeService, err := compute.New(c)
+		if err != nil {
+			log.Println(err)
+		}else{
+
+			resp, err := computeService.Networks.Get(project, network_name).Context(ctx).Do()
+			if err != nil {
+				log.Println(err)
+			}else{
+
+				// TODO: Change code below to process the `resp` object:
+				fmt.Printf("%#v\n", resp)
+
+				if(resp!=nil){
+
+					// already exists
+					respNetwork, err := computeService.Networks.Delete(project, network_name).Context(ctx).Do()
+					if err != nil {
+						log.Println(err)
+					}
+
+					// TODO: Change code below to process the `resp` object:
+					fmt.Printf("%#v\n", respNetwork)
+				}else{
+
+					// no need to do anything
+				}
+			}
+		}
+	}
+}
+func deleteFirewall(network_name string, project string){
+	ctx := context.Background()
+	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
+	if err != nil {
+		log.Println(err)
+	}else{
+
+		computeService, err := compute.New(c)
+		if err != nil {
+			log.Println(err)
+		}else{
+
+			firewall_name:="allow-all"
+
+			respFirewall, err := computeService.Firewalls.Delete(project, firewall_name).Context(ctx).Do()
+			if err != nil {
+				log.Println(err)
+			}else{
+
+				// TODO: Change code below to process the `resp` object:
+				fmt.Printf("%#v\n", respFirewall)
+			}
+		}
+	}
+}
+
+func deleteInstance(zone, network_name string, project string){
+
+	ctx := context.Background()
+
+	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
+	if err != nil {
+		log.Println(err)
+	}else{
+
+		computeService, err := compute.New(c)
+		if err != nil {
+			log.Println(err)
+		}else{
+			vm_Name:="appa-server"
+			resp, err := computeService.Instances.Delete(project, zone, vm_Name).Context(ctx).Do()
+			if err != nil {
+				log.Println(err)
+			}else{
+				// TODO: Change code below to process the `resp` object:
+				fmt.Printf("%#v\n", resp)
+			}
+		}
+	}
+}
+
+func deleteAll(zone, network_name, project string)  {
+	deleteNetwork(network_name, project)
+	deleteFirewall(network_name, project)
+	deleteInstance(zone, network_name, project)
+}
 func createGoogleInstance() {
 
 	ctx := context.Background()
@@ -257,4 +350,7 @@ func createGoogleInstance() {
 	createInstance(zone, network_name, project)
 
 
+	time.Sleep(3 * time.Minute)
+
+	deleteAll(zone, network_name, project)
 }
