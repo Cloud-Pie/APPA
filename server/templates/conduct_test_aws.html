@@ -53,6 +53,36 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong class="card-title">Num Cells</strong>
+                            </div>
+                            <div class="card-body">
+                                <input type="text" name="numCells" value="Specify number of cells">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong class="card-title">Num of Cores</strong>
+                            </div>
+                            <div class="card-body">
+                                <input type="text" name="numCores" value="Specify number of cores">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong class="card-title">name of test Case </strong>
+                            </div>
+                            <div class="card-body">
+                                <input type="text" name="Test_case" value="Specify name of test case">
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-3 col-lg-3">
                         <div class="card">
                             <div class="card-header">
@@ -135,7 +165,10 @@
     $("#submit-button").click(function() {
         let data = {
             "AppGitPath":document.forms["startTestForm"]["AppGitPath"].value,
-            "InstanceType": document.forms["startTestForm"]["InstanceType"].value
+            "InstanceType": document.forms["startTestForm"]["InstanceType"].value,
+            "NumCells": document.forms["startTestForm"]["numCells"].value,
+            "NumCores": document.forms["startTestForm"]["numCores"].value,
+            "Test_case": document.forms["startTestForm"]["Test_case"].value
 
         };
         let uRl = "/deployAndRunApplication/";

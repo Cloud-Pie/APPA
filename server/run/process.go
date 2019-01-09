@@ -92,7 +92,7 @@ func getPublicIpTool() string {
 	return string(wanip)
 }
 
-func getVMStartScript(gitPath,testName, publicIpTool string)string{
+func getVMStartScript(gitPath,testName, publicIpTool,test_case string)string{
 	var VMStartScript = `#!bin/sh
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
@@ -138,7 +138,7 @@ git clone `+ gitPath+ `
 aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data/constant/ openfoam/openfoam_src/example/
-cd openfoam/scripts
+cd openfoam/`+ test_case+ `scripts
 sh ./deploy_app.sh
 $file_name = /results/result.tar.gz 
 while [ -ne $file_name ]
@@ -160,7 +160,7 @@ curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 	return encodedString
 }
 
-func startTestVM( gitAppPath, testVMType,testName string)  string {
+func startTestVM( gitAppPath, testVMType,testName,test_case string)  string {
 
 	sessionAWS := session.Must(session.NewSession(&aws.Config{
 		Credentials: credentials.NewStaticCredentials(AWSConfig.AwsAccessKeyId, AWSConfig.AwsSecretAccessKey, ""),
@@ -199,7 +199,7 @@ func startTestVM( gitAppPath, testVMType,testName string)  string {
 				},
 			},
 		},
-		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer)),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case)),
 	}
 
 	result, err := svc.RunInstances(input)
@@ -316,13 +316,13 @@ func updateTargetFiles(ip, port, typeTarget, fileName string, targetArray []Prom
 		fmt.Println("File Written", fileName)
 	}
 }
-func launchVMandDeploy(gitAppPath , testVMType string ){
+func launchVMandDeploy(gitAppPath , testVMType,test_case, numCells, numCores string ){
 
 	log.Println("Starting a test VM of type ", testVMType, " and running the application")
 
 	testName:= "appa_"+strconv.FormatInt(time.Now().Unix(), 10)
 
-	startedInstanceId :=startTestVM(gitAppPath, testVMType, testName)
+	startedInstanceId :=startTestVM(gitAppPath, testVMType, testName,test_case)
 	if( startedInstanceId==""){
 		log.Fatal("Cannot start test VM, terminating test start again latter")
 		return
@@ -341,6 +341,8 @@ func launchVMandDeploy(gitAppPath , testVMType string ){
 		InstanceType		:	testVMType,
 		GitPath				: 	gitAppPath,
 		S3FileName			: 	testName+".tar.gz",
+		NumCells 			: 	numCells,
+		NumCores			: 	numCores,
 		Phase				:   "Deployment",
 	}
 	if err := collection.Insert(AllData); err != nil {

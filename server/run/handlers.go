@@ -138,7 +138,7 @@ func DeployAndRunApplication(w http.ResponseWriter, r *http.Request)  {
 	}else{
 		//TODO: DO error checks whether the fields are empty or nor
 		//TODO: Need to add monitoring agent for VM, containers to collect and store all data for later analysis
-		go launchVMandDeploy(inputValues.AppGitPath,inputValues.InstanceType)
+		go launchVMandDeploy(inputValues.AppGitPath,inputValues.InstanceType, inputValues.Test_case, inputValues.NumCells, inputValues.NumCores)
 		w.Write([]byte("The process has started, check the logs for details!!"))
 	}
 }

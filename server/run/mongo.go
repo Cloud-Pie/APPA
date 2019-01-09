@@ -29,6 +29,8 @@ type TestInformation struct {
 	S3FileName				string `json:"S3FileName"`
 	PublicIpAddress			string `json:"PublicIpAddress"`
 	EndTimestamp     		int64 `json:"EndTimestamp"`
+	NumCells				string `json:"NumCells"`
+	NumCores				string `json:"NumCores"`
 }
 
 
