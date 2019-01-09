@@ -166,11 +166,12 @@
         let data = {
             "AppGitPath":document.forms["startTestForm"]["AppGitPath"].value,
             "InstanceType": document.forms["startTestForm"]["InstanceType"].value,
+            "Test_case": document.forms["startTestForm"]["Test_case"].value,
             "NumCells": document.forms["startTestForm"]["numCells"].value,
-            "NumCores": document.forms["startTestForm"]["numCores"].value,
-            "Test_case": document.forms["startTestForm"]["Test_case"].value
+            "NumCores": document.forms["startTestForm"]["numCores"].value
 
         };
+        console.log(data);
         let uRl = "/deployAndRunApplication/";
         fetch(uRl,{
             method: "POST",

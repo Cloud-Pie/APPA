@@ -39,8 +39,8 @@ type InputStruct struct {
 	AppGitPath 				string 		`json:"AppGitPath"`
 	InstanceType 			string		`json:"InstanceType"`
 	Test_case 				string		`json:"Test_case"`
-	NumCores 			string		`json:"InstanceType"`
-	NumCells 			string		`json:"InstanceType"`
+	NumCores 				string			`json:"NumCores"`
+	NumCells 				string			`json:"NumCells"`
 
 }
 type LabelDef struct {
