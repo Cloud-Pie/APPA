@@ -105,22 +105,37 @@ func createNetwork(network_name string, project string ){
 		log.Println(err)
 	}
 
-
-	rbNetwork := &compute.Network{
-		RoutingConfig: &compute.NetworkRoutingConfig{RoutingMode:"GLOBAL"},
-		Name:network_name,
-		Description:"network for appa",
-		AutoCreateSubnetworks:true,
-		// TODO: Add desired fields of the request body.
-	}
-
-	respNetwork, err := computeService.Networks.Insert(project, rbNetwork).Context(ctx).Do()
+	resp, err := computeService.Networks.Get(project, network_name).Context(ctx).Do()
 	if err != nil {
 		log.Println(err)
 	}
 
 	// TODO: Change code below to process the `resp` object:
-	fmt.Printf("%#v\n", respNetwork)
+	fmt.Printf("%#v\n", resp)
+
+	if(resp!=nil){
+
+		// already exists
+	}else{
+
+		rbNetwork := &compute.Network{
+			RoutingConfig: &compute.NetworkRoutingConfig{RoutingMode:"GLOBAL"},
+			Name:network_name,
+			Description:"network for appa",
+			AutoCreateSubnetworks:true,
+			// TODO: Add desired fields of the request body.
+		}
+
+		respNetwork, err := computeService.Networks.Insert(project, rbNetwork).Context(ctx).Do()
+		if err != nil {
+			log.Println(err)
+		}
+
+		// TODO: Change code below to process the `resp` object:
+		fmt.Printf("%#v\n", respNetwork)
+	}
+
+
 
 }
 
@@ -214,12 +229,30 @@ func createGoogleInstance() {
 	network_name:="appa-network"
 
 
+
+
 	createNetwork(network_name, project)
 
-	time.Sleep(60 * time.Second) // TODO: chenage this to query later on
+	stopChecking := Schedule(func() {
+		log.Println("waiting for some time for the network to become ready")
+		// need to have a mechanism by which I query application and stop checking whether its deployed or not
+	}, 30*time.Second)
+	time.Sleep(2 * time.Minute)
+
+	// assuming that it might be finished need to add some check conditions here
+	stopChecking <- true
 
 
 	addFirewallConfig(network_name, project)
+
+	stopChecking2 := Schedule(func() {
+		log.Println("waiting for some time for the network to become ready")
+		// need to have a mechanism by which I query application and stop checking whether its deployed or not
+	}, 30*time.Second)
+	time.Sleep(2 * time.Minute)
+
+	// assuming that it might be finished need to add some check conditions here
+	stopChecking2 <- true
 
 	createInstance(zone, network_name, project)
 
