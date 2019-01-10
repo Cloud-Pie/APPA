@@ -107,4 +107,11 @@ var routes = Routes{
 		ConductTestAWSHandler,
 	},
 
+	Route{
+		"ConductTestGCEHandler",
+		strings.ToUpper("Get"),
+		"/conduct_test_gce",
+		ConductTestGCEHandler,
+	},
+
 }

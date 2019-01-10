@@ -18,20 +18,21 @@ var mgoSession   *mgo.Session
 
 type TestInformation struct {
 	TestName 				string `json:"TestName"`
-	S3BucketName			string `json:"S3BucketName"`
+	BucketName				string `json:"BucketName"`
 	InstanceId 				string `json:"InstanceId"`
-	AWSRegion				string `json:"AWSRegion"`
+	Region					string `json:"Region"`
 	StartTimestamp     		int64 `json:"StartTimestamp"`
 	NumInstances          	int64 `json:"NumInstances"`
 	InstanceType   			string `json:"InstanceType"`
 	GitPath            		string `json:"GitPath"`
 	Phase              		string `json:"Phase"`
-	S3FileName				string `json:"S3FileName"`
+	FileName				string `json:"FileName"`
 	PublicIpAddress			string `json:"PublicIpAddress"`
 	EndTimestamp     		int64 `json:"EndTimestamp"`
 	NumCells				string `json:"NumCells"`
 	NumCores				string `json:"NumCores"`
 	Test_case				string `json:"Test_case"`
+	CSP						string `json:"CSP"`
 }
 
 

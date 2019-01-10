@@ -234,30 +234,38 @@ func startTestVM( gitAppPath, testVMType,testName,test_case string)  string {
 	return allInstancesStarted[0].InstanceId
 }
 
-func terminateTestVM(instanceId string) {
+func terminateTestVM(instanceId, csp, zone string) {
 
-	session := session.Must(session.NewSession(&aws.Config{
-		Credentials: credentials.NewStaticCredentials(AWSConfig.AwsAccessKeyId, AWSConfig.AwsSecretAccessKey, ""),
-		Region:      aws.String(AWSConfig.Region),
-	}))
+	switch csp {
 
-	svc2 := ec2.New(session)
+	case "AWS":
+		session := session.Must(session.NewSession(&aws.Config{
+			Credentials: credentials.NewStaticCredentials(AWSConfig.AwsAccessKeyId, AWSConfig.AwsSecretAccessKey, ""),
+			Region:      aws.String(AWSConfig.Region),
+		}))
 
-	var allInstances []string
+		svc2 := ec2.New(session)
 
-	input2 := ec2.TerminateInstancesInput{InstanceIds: []*string{
-		aws.String(instanceId),
-	},}
-	result2, er2r := svc2.TerminateInstances(&input2)
-	if er2r != nil {
-		log.Fatal(er2r)
-		return
+		var allInstances []string
+
+		input2 := ec2.TerminateInstancesInput{InstanceIds: []*string{
+			aws.String(instanceId),
+		},}
+		result2, er2r := svc2.TerminateInstances(&input2)
+		if er2r != nil {
+			log.Fatal(er2r)
+			return
+		}
+		for _, instance := range result2.TerminatingInstances {
+			allInstances = append(allInstances, ValueAssignString(instance.InstanceId, ""))
+		}
+
+		log.Println("Terminate Instances with id: ", allInstances)
+
+	case "GCE":
+		deleteAll(instanceId,zone)
 	}
-	for _, instance := range result2.TerminatingInstances {
-		allInstances = append(allInstances, ValueAssignString(instance.InstanceId, ""))
-	}
 
-	log.Println("Terminate Instances with id: ", allInstances)
 
 }
 
@@ -316,11 +324,8 @@ func updateTargetFiles(ip, port, typeTarget, fileName string, targetArray []Prom
 		fmt.Println("File Written", fileName)
 	}
 }
-func launchVMandDeploy(gitAppPath , testVMType,test_case, numCells, numCores string ){
 
-	log.Println("Starting a test VM of type ", testVMType, " and running the application")
-
-	testName:= "appa_"+strconv.FormatInt(time.Now().Unix(), 10)
+func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, numCores string){
 
 	startedInstanceId :=startTestVM(gitAppPath, testVMType, testName,test_case)
 	if( startedInstanceId==""){
@@ -333,18 +338,19 @@ func launchVMandDeploy(gitAppPath , testVMType,test_case, numCells, numCores str
 
 	AllData := TestInformation{
 		TestName			:  	testName,
-		S3BucketName		:  	AWSConfig.S3BucketName,
+		BucketName		:  	AWSConfig.S3BucketName,
 		InstanceId 			: 	startedInstanceId,
-		AWSRegion			:  	AWSConfig.Region,
+		Region			:  	AWSConfig.Region,
 		StartTimestamp		:	time.Now().Unix(),
 		NumInstances		:   1,
 		InstanceType		:	testVMType,
 		GitPath				: 	gitAppPath,
-		S3FileName			: 	testName+".tar.gz",
+		FileName			: 	testName+".tar.gz",
 		NumCells 			: 	numCells,
 		NumCores			: 	numCores,
 		Phase				:   "Deployment",
 		Test_case			:  test_case,
+		CSP					: "AWS",
 	}
 	if err := collection.Insert(AllData); err != nil {
 		log.Fatal("error ", err)
@@ -377,6 +383,84 @@ func launchVMandDeploy(gitAppPath , testVMType,test_case, numCells, numCores str
 	defer mongoSession.Close()
 }
 
+func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, numCores,zone string){
+
+	startedInstanceId :=createGoogleInstance(gitAppPath, testVMType, testName,test_case,zone)
+	if( startedInstanceId==""){
+		log.Fatal("Cannot start test VM, terminating test start again latter")
+		return
+	}
+	mongoSession := GetMongoSession()
+	collection := mongoSession.DB(Database).C(Collection_Name)
+
+
+	AllData := TestInformation{
+		TestName			:  	testName,
+		BucketName			:  	GCEConfig.BucketName,
+		InstanceId 			: 	startedInstanceId,
+		Region				:  	zone,
+		StartTimestamp		:	time.Now().Unix(),
+		NumInstances		:   1,
+		InstanceType		:	testVMType,
+		GitPath				: 	gitAppPath,
+		FileName			: 	testName+".tar.gz",
+		NumCells 			: 	numCells,
+		NumCores			: 	numCores,
+		Phase				:   "Deployment",
+		Test_case			:  test_case,
+		CSP					:  "GCE",
+	}
+	if err := collection.Insert(AllData); err != nil {
+		log.Fatal("error ", err)
+	} else {
+		log.Println("#inserted into ", Collection_Name)
+	}
+
+	stopChecking := Schedule(func() {
+		log.Println("waiting for some time for the VM to start and run app")
+		// need to have a mechanism by which I query application and stop checking whether its deployed or not
+		getInstanceIp(startedInstanceId,zone)
+	}, 30*time.Second)
+	time.Sleep(1 * time.Minute)
+
+	// assuming that it might be finished need to add some check conditions here
+	stopChecking <- true
+	publicAddress:= getInstanceIp(startedInstanceId,zone)
+	log.Println("Public Ip Address : ",publicAddress )
+	log.Println("Starting the App")
+	///updateTargetFiles(publicAddress, "9323","docker_remote", "/targets/targets_docker.json", targetsDocker)
+	///updateTargetFiles(publicAddress, "9091","pushgateway_remote", "/targets/targets_pushgateway.json", targetsPushGateway)
+	//updateTargetFiles(publicAddress, "8080","cadvisor_remote", "/targets/targets_cadvisor.json", targetsCadvisor)
+	//updateTargetFiles(publicAddress, "9100","nodeexporter_remote", "/targets/targets_nodeexporter.json", targetsNodeExporter)
+	fmt.Println("testname", testName)
+	errMongoU := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"phase": "Deployed","publicipaddress": publicAddress}})
+	if errMongoU != nil {
+		log.Fatal("Error : %s", errMongoU)
+	}
+
+	defer mongoSession.Close()
+}
+func launchVMandDeploy(inputValues InputStruct ){
+
+	log.Println("Starting a test VM of type ", inputValues.InstanceType, " and running the application on cloud ", inputValues.CSP)
+
+	testName:= "appa_"+strconv.FormatInt(time.Now().Unix(), 10)
+
+	switch inputValues.CSP {
+
+	case "aws":
+		startInstanceAWS(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores )
+
+	case "gce":
+		startInstanceGCE(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores, inputValues.Zone )
+	default:
+		log.Println("Not the correct case")
+
+	}
+
+
+}
+
 func testFinishedTerminateVM(testName string){
 	mongoSession := GetMongoSession()
 	collection := mongoSession.DB(Database).C(Collection_Name)
@@ -387,7 +471,7 @@ func testFinishedTerminateVM(testName string){
 		return
 	}
 	log.Println(" Terminating the VM")
-	terminateTestVM(testInformation.InstanceId)
+	terminateTestVM(testInformation.InstanceId, testInformation.CSP, testInformation.Region)
 
 	errMonFin := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"endtimestamp": time.Now().Unix(),
 		"phase": "Completed"}})

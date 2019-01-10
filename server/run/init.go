@@ -24,6 +24,9 @@ func initConfig()  {
 	fmt.Println("AwsAccessKeyId: ", AWSConfig.AwsAccessKeyId)
 	fmt.Println("IP address: ", AWSConfig.PublicIpServer)
 
+	GCEConfig =  GCEConfigStruct{ BucketName: os.Getenv("GCE_BUCKET_PREFIX")+"appa",
+									NetworkName: os.Getenv("GCE_NETWORK_NAME"), PublicIpServer: os.Getenv("SERVER_PUBLIC_IP")}
+
 	// test code
 
 	//createGoogleInstance()

@@ -8,6 +8,7 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/compute/v1"
 	"time"
+	"strconv"
 )
 
 // BEFORE RUNNING:
@@ -24,7 +25,7 @@ import (
 // 3. Install and update the Go dependencies by running `go get -u` in the
 //    project directory.
 
-func getVMStartUpScript(gitPath,testName, publicIpTool string) string {
+func getVMStartUpScript(gitPath,testName, publicIpTool ,test_case string) string {
 	var VMStartScript = `#!bin/sh
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
@@ -69,8 +70,8 @@ aws configure set region `+AWSConfig.Region+`
 git clone `+ gitPath+ `
 aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
-cp -R Inlet_Data/Inlet_Data/constant/ openfoam/openfoam_src/code/
-cd openfoam/scripts
+cp -R Inlet_Data/Inlet_Data/constant/ openfoam/`+ test_case+ `/openfoam_src/code/
+cd openfoam/`+ test_case+ `/scripts
 sh ./deploy_app.sh
 $file_name = /results/result.tar.gz 
 while [ -ne $file_name ]
@@ -91,7 +92,7 @@ curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 }
 
 
-func createNetwork(network_name string, project string ){
+func createNetwork(project string ){
 	ctx := context.Background()
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
@@ -102,7 +103,7 @@ func createNetwork(network_name string, project string ){
 			log.Println(err)
 		}else{
 
-			resp, err := computeService.Networks.Get(project, network_name).Context(ctx).Do()
+			resp, err := computeService.Networks.Get(project, GCEConfig.NetworkName).Context(ctx).Do()
 			if err != nil {
 				log.Println(err)
 			}
@@ -117,7 +118,7 @@ func createNetwork(network_name string, project string ){
 
 				rbNetwork := &compute.Network{
 					RoutingConfig: &compute.NetworkRoutingConfig{RoutingMode:"GLOBAL"},
-					Name:network_name,
+					Name:GCEConfig.NetworkName,
 					Description:"network for appa",
 					AutoCreateSubnetworks:true,
 					// TODO: Add desired fields of the request body.
@@ -137,7 +138,7 @@ func createNetwork(network_name string, project string ){
 	}
 }
 
-func addFirewallConfig(network_name string, project string){
+func addFirewallConfig(project string){
 	ctx := context.Background()
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
@@ -153,7 +154,7 @@ func addFirewallConfig(network_name string, project string){
 				Description: "Allowed all traffic",
 				Direction: "INGRESS",
 				Name:"allow-all",
-				Network:"projects/"+project +"/global/networks/"+network_name,
+				Network:"projects/"+project +"/global/networks/"+GCEConfig.NetworkName,
 				// TODO: Add desired fields of the request body.
 			}
 
@@ -170,7 +171,7 @@ func addFirewallConfig(network_name string, project string){
 
 }
 
-func createInstance(zone, network_name string, project string){
+func createInstance(project,gitAppPath, testVMType,testName,test_case, zone string) string{
 
 	ctx := context.Background()
 
@@ -184,13 +185,13 @@ func createInstance(zone, network_name string, project string){
 			log.Println(err)
 		}else{
 
-			vmStartscript:=getVMStartUpScript("path test","test", AWSConfig.PublicIpServer) // TODO: Update this values
+			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case)
 
 			rb := &compute.Instance{
-				MachineType:"zones/us-central1-a/machineTypes/n1-standard-1",
+				MachineType:"zones/"+zone+"/machineTypes/"+testVMType, 
 				Name:"appa-server",
 				NetworkInterfaces:[]*compute.NetworkInterface{&compute.NetworkInterface{AccessConfigs: []*compute.AccessConfig{&compute.AccessConfig{Name:"External NAT", NetworkTier:"STANDARD"}},
-					Network:"projects/"+project +"/global/networks/"+network_name}},
+					Network:"projects/"+project +"/global/networks/"+GCEConfig.NetworkName}},
 				Disks:[]*compute.AttachedDisk{&compute.AttachedDisk{ AutoDelete:true, Boot: true, InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",
 					DiskSizeGb:50, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}}},
 				Metadata:&compute.Metadata{Items:[]*compute.MetadataItems{&compute.MetadataItems{Key:"startup-script",Value: &vmStartscript}}},
@@ -203,14 +204,26 @@ func createInstance(zone, network_name string, project string){
 			}else{
 				// TODO: Change code below to process the `resp` object:
 				fmt.Printf("%#v\n", resp)
+				return strconv.FormatUint(resp.Id, 64)
 			}
 		}
 	}
+	return ""
 }
 
-func deleteNetwork(network_name string, project string){
+func deleteNetwork(){
 
 	ctx := context.Background()
+
+	creds, err := google.FindDefaultCredentials(ctx, compute.CloudPlatformScope)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Project ID for this request.
+	project := creds.ProjectID
+
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
 		log.Println(err)
@@ -221,7 +234,7 @@ func deleteNetwork(network_name string, project string){
 			log.Println(err)
 		}else{
 
-			resp, err := computeService.Networks.Get(project, network_name).Context(ctx).Do()
+			resp, err := computeService.Networks.Get(project, GCEConfig.NetworkName).Context(ctx).Do()
 			if err != nil {
 				log.Println(err)
 			}else{
@@ -232,7 +245,7 @@ func deleteNetwork(network_name string, project string){
 				if(resp!=nil){
 
 					// already exists
-					respNetwork, err := computeService.Networks.Delete(project, network_name).Context(ctx).Do()
+					respNetwork, err := computeService.Networks.Delete(project, GCEConfig.NetworkName).Context(ctx).Do()
 					if err != nil {
 						log.Println(err)
 					}
@@ -247,8 +260,17 @@ func deleteNetwork(network_name string, project string){
 		}
 	}
 }
-func deleteFirewall(network_name string, project string){
+func deleteFirewall(){
 	ctx := context.Background()
+
+	creds, err := google.FindDefaultCredentials(ctx, compute.CloudPlatformScope)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Project ID for this request.
+	project := creds.ProjectID
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
 	if err != nil {
 		log.Println(err)
@@ -273,37 +295,7 @@ func deleteFirewall(network_name string, project string){
 	}
 }
 
-func deleteInstance(zone, network_name string, project string){
-
-	ctx := context.Background()
-
-	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
-	if err != nil {
-		log.Println(err)
-	}else{
-
-		computeService, err := compute.New(c)
-		if err != nil {
-			log.Println(err)
-		}else{
-			vm_Name:="appa-server"
-			resp, err := computeService.Instances.Delete(project, zone, vm_Name).Context(ctx).Do()
-			if err != nil {
-				log.Println(err)
-			}else{
-				// TODO: Change code below to process the `resp` object:
-				fmt.Printf("%#v\n", resp)
-			}
-		}
-	}
-}
-
-func deleteAll(zone, network_name, project string)  {
-	deleteNetwork(network_name, project)
-	deleteFirewall(network_name, project)
-	deleteInstance(zone, network_name, project)
-}
-func createGoogleInstance() {
+func deleteInstance(instanceId,zone string){
 
 	ctx := context.Background()
 
@@ -314,17 +306,46 @@ func createGoogleInstance() {
 	}
 
 	// Project ID for this request.
-	project := creds.ProjectID // TODO: Update placeholder value.
+	project := creds.ProjectID
 
-	// The name of the zone for this request.
-	zone := "us-central1-a"
+	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
+	if err != nil {
+		log.Println(err)
+	}else{
 
-	network_name:="appa-network"
+		computeService, err := compute.New(c)
+		if err != nil {
+			log.Println(err)
+		}else{
+			resp, err := computeService.Instances.Delete(project,zone, instanceId).Context(ctx).Do()
+			if err != nil {
+				log.Println(err)
+			}else{
+				// TODO: Change code below to process the `resp` object:
+				fmt.Printf("%#v\n", resp)
+			}
+		}
+	}
+}
 
+func deleteAll(instanceId,zone string)  {
+	deleteNetwork()
+	deleteFirewall()
+	deleteInstance(instanceId,zone)
+}
+func createGoogleInstance(gitAppPath, testVMType,testName,test_case,zone string) string {
 
+	ctx := context.Background()
 
+	creds, err := google.FindDefaultCredentials(ctx, compute.CloudPlatformScope)
 
-	createNetwork(network_name, project)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Project ID for this request.
+	project := creds.ProjectID
+	createNetwork(project)
 
 	stopChecking := Schedule(func() {
 		log.Println("waiting for some time for the network to become ready")
@@ -336,7 +357,7 @@ func createGoogleInstance() {
 	stopChecking <- true
 
 
-	addFirewallConfig(network_name, project)
+	addFirewallConfig(project)
 
 	stopChecking2 := Schedule(func() {
 		log.Println("waiting for some time for the network to become ready")
@@ -347,10 +368,49 @@ func createGoogleInstance() {
 	// assuming that it might be finished need to add some check conditions here
 	stopChecking2 <- true
 
-	createInstance(zone, network_name, project)
+	instanceID := createInstance(project,gitAppPath, testVMType,testName,test_case, zone)
 
+	return instanceID
+	//time.Sleep(3 * time.Minute)
 
-	time.Sleep(3 * time.Minute)
+	//deleteAll(project)
+}
 
-	deleteAll(zone, network_name, project)
+func getInstanceIp(instanceId,zone string) string{
+	ctx := context.Background()
+
+	creds, err := google.FindDefaultCredentials(ctx, compute.CloudPlatformScope)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Project ID for this request.
+	project := creds.ProjectID
+
+	// The name of the zone for this request.
+	//zone := "us-central1-a"
+
+	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
+	if err != nil {
+		log.Println(err)
+	}else{
+
+		computeService, err := compute.New(c)
+		if err != nil {
+			log.Println(err)
+		}else{
+			resp, err := computeService.Instances.Get(project, zone, instanceId).Context(ctx).Do()
+			if err != nil {
+				log.Println(err)
+			}else{
+				// TODO: Change code below to process the `resp` object:
+				fmt.Printf("%#v\n", resp)
+
+				return resp.NetworkInterfaces[0].NetworkIP
+			}
+		}
+	}
+	return ""
+
 }

@@ -50,6 +50,19 @@ func ConductTestAWSHandler(w http.ResponseWriter, r *http.Request) {
 
 
 }
+func ConductTestGCEHandler(w http.ResponseWriter, r *http.Request) {
+
+
+	tmpl, err := template.New("").ParseFiles("templates/conduct_test_gce.html", "templates/base.html")
+	// check your err
+	if(err!=nil){
+		log.Println("err")
+	}else{
+		err = tmpl.ExecuteTemplate(w, "base", "")
+	}
+
+
+}
 func DownloadData(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: GIve the download link to download the file based upon the name
@@ -138,7 +151,7 @@ func DeployAndRunApplication(w http.ResponseWriter, r *http.Request)  {
 	}else{
 		//TODO: DO error checks whether the fields are empty or nor
 		//TODO: Need to add monitoring agent for VM, containers to collect and store all data for later analysis
-		go launchVMandDeploy(inputValues.AppGitPath,inputValues.InstanceType, inputValues.Test_case, inputValues.NumCells, inputValues.NumCores)
+		go launchVMandDeploy(inputValues)
 		w.Write([]byte("The process has started, check the logs for details!!"))
 	}
 }

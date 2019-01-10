@@ -92,45 +92,77 @@
 
                                 <select name="InstanceType" data-placeholder="Select Instance Type..." class="standardSelect" tabindex="1">
                                     <option value=""></option>
-                                    <optgroup label="t2">
-                                        <option value="t2.nano">t2.nano</option>
-                                        <option value="t2.micro">t2.micro</option>
-                                        <option value="t2.small">t2.small</option>
-                                        <option value="t2.medium">t2.medium</option>
-                                        <option value="t2.large">t2.large</option>
-                                        <option value="t2.xlarge">t2.xlarge</option>
-                                        <option value="t2.2xlarge">t2.2xlarge</option>
+                                    <optgroup label="n1-standard">
+                                        <option value="n1-standard-1">n1-standard-1</option>
+                                        <option value="n1-standard-2">n1-standard-2</option>
+                                        <option value="n1-standard-4">n1-standard-4</option>
+                                        <option value="n1-standard-8">n1-standard-8</option>
+                                        <option value="n1-standard-16">n1-standard-16</option>
+                                        <option value="n1-standard-32">n1-standard-32</option>
+                                        <option value="n1-standard-64">n1-standard-64</option>
+                                        <option value="n1-standard-96">n1-standard-96</option>
                                     </optgroup>
-                                    <optgroup label="c4">
-                                        <option value="c4.large">c4.large</option>
-                                        <option value="c4.xlarge">c4.xlarge</option>
-                                        <option value="c4.2xlarge">c4.2xlarge</option>
-                                        <option value="c4.4xlarge">c4.4xlarge</option>
-                                        <option value="c4.8xlarge">c4.8xlarge</option>
+                                    <optgroup label="n1-highcpu">
+                                        <option value="n1-highcpu-2">n1-highcpu-2</option>
+                                        <option value="n1-highcpu-4">n1-highcpu-4</option>
+                                        <option value="n1-highcpu-8">n1-highcpu-8</option>
+                                        <option value="n1-highcpu-16">n1-highcpu-16</option>
+                                        <option value="n1-highcpu-32">n1-highcpu-32</option>
+                                        <option value="n1-highcpu-64">n1-highcpu-64</option>
+                                        <option value="n1-highcpu-96">n1-highcpu-96</option>
                                     </optgroup>
-                                    <optgroup label="c5">
-                                        <option value="c5.large">c5.large</option>
-                                        <option value="c5.xlarge">c5.xlarge</option>
-                                        <option value="c5.2xlarge">c5.2xlarge</option>
-                                        <option value="c5.4xlarge">c5.4xlarge</option>
-                                        <option value="c5.9xlarge">c5.9xlarge</option>
-                                        <option value="c5.18xlarge">c5.18xlarge</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-lg-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong class="card-title">Zone</strong>
+                            </div>
+                            <div class="card-body">
+
+                                <select name="zone" data-placeholder="Select Region/Zone..." class="standardSelect" tabindex="1">
+                                    <option value=""></option>
+                                    <optgroup label="asia-east1">
+                                        <option value="asia-east1-a">asia-east1-a</option>
+                                        <option value="asia-east1-b">asia-east1-b</option>
+                                        <option value="asia-east1-c">asia-east1-c</option>
                                     </optgroup>
-                                    <optgroup label="c5d">
-                                        <option value="c5d.large">c5d.large</option>
-                                        <option value="c5d.xlarge">c5d.xlarge</option>
-                                        <option value="c5d.2xlarge">c5d.2xlarge</option>
-                                        <option value="c5d.4xlarge">c5d.4xlarge</option>
-                                        <option value="c5d.9xlarge">c5d.9xlarge</option>
-                                        <option value="c5d.18xlarge">c5d.18xlarge</option>
+                                    <optgroup label="asia-east2">
+                                        <option value="asia-east2-a">asia-east2-a</option>
+                                        <option value="asia-east2-b">asia-east2-b</option>
+                                        <option value="asia-east2-c">asia-east2-c</option>
                                     </optgroup>
-                                    <optgroup label="c5n">
-                                        <option value="c5n.large">c5n.large</option>
-                                        <option value="c5n.xlarge">c5n.xlarge</option>
-                                        <option value="c5n.2xlarge">c5n.2xlarge</option>
-                                        <option value="c5n.4xlarge">c5n.4xlarge</option>
-                                        <option value="c5n.9xlarge">c5n.9xlarge</option>
-                                        <option value="c5n.18xlarge">c5n.18xlarge</option>
+                                    <optgroup label="europe-north1">
+                                        <option value="europe-north1-a">europe-north1-a</option>
+                                        <option value="europe-north1-b">europe-north1-b</option>
+                                        <option value="europe-north1-c">europe-north1-c</option>
+                                    </optgroup>
+                                    <optgroup label="europe-west1">
+                                        <option value="europe-west1-a">europe-west1-a</option>
+                                        <option value="europe-west1-b">europe-west1-b</option>
+                                        <option value="europe-west1-c">europe-west1-c</option>
+                                    </optgroup>
+                                    <optgroup label="europe-west2">
+                                        <option value="europe-west2-a">europe-west2-a</option>
+                                        <option value="europe-west2-b">europe-west2-b</option>
+                                        <option value="europe-west2-c">europe-west2-c</option>
+                                    </optgroup>
+                                    <optgroup label="europe-west3">
+                                        <option value="europe-west3-a">europe-west3-a</option>
+                                        <option value="europe-west3-b">europe-west3-b</option>
+                                        <option value="europe-west3-c">europe-west3-c</option>
+                                    </optgroup>
+                                    <optgroup label="us-central1">
+                                        <option value="us-central1-a">us-central1-a</option>
+                                        <option value="us-central1-b">us-central1-b</option>
+                                        <option value="us-central1-c">us-central1-c</option>
+                                    </optgroup>
+                                    <optgroup label="europe-west4">
+                                        <option value="europe-west4-a">europe-west4-a</option>
+                                        <option value="europe-west4-b">europe-west4-b</option>
+                                        <option value="europe-west4-c">europe-west4-c</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -169,8 +201,8 @@
             "Test_case": document.forms["startTestForm"]["Test_case"].value,
             "NumCells": document.forms["startTestForm"]["numCells"].value,
             "NumCores": document.forms["startTestForm"]["numCores"].value,
-            "CSP": "aws",
-            "Zone": ""
+            "CSP": "gce",
+            "Zone": document.forms["startTestForm"]["zone"].value,
 
         };
         console.log(data);
