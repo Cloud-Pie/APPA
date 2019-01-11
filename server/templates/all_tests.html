@@ -37,12 +37,10 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th>TestName</th>
                         <th>StartTime</th>
                         <th>BucketName</th>
                         <th>NodeInstanceType</th>
                         <th>FileName</th>
-                        <th>NumInstances</th>
                         <th>Test_case</th>
                         <th>CSP</th>
 						<th>EndTimestamp</th>
@@ -52,12 +50,10 @@
                     <tfoot>
                     <tr>
 						<th></th>
-                        <th>TestName</th>
                         <th>StartTime</th>
                         <th>BucketName</th>
                         <th>InstanceType</th>
                         <th>FileName</th>
-                        <th>NumInstances</th>
                         <th>Test_case</th>
                         <th>CSP</th>
 						<th>EndTimestamp</th>
@@ -98,6 +94,8 @@
         fetch("/getAllTestsInformation")
                 .then(response => response.json())
                 .then(allTestsInfo => {
+                    allTestsInfo.StartTimestamp = new Date(allTestsInfo.StartTimestamp * 1000);
+                    allTestsInfo.EndTimestamp = new Date(allTestsInfo.EndTimestamp * 1000);
                     console.log(allTestsInfo);
                     let allData = [];
                     //Once we fetch the list, we iterate over it
@@ -110,12 +108,10 @@
                                     "data":           null,
                                     "defaultContent": ''
                                 },
-                                { "data": "TestName" },
                                 { "data": "StartTimestamp" },
                                 { "data": "BucketName" },
                                 { "data": "InstanceType" },
                                 { "data": "FileName" },
-                                { "data": "NumInstances" },
                                 { "data": "Test_case" },
                                 { "data": "CSP" },
     							 { "data": "EndTimestamp" },

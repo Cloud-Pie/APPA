@@ -50,6 +50,7 @@ type InputStruct struct {
 	NumCells 				string		`json:"NumCells"`
 	CSP  				    string		`json:"CSP"`
 	Zone  				    string		`json:"Zone"`
+	MaxTimeSteps		    string		`json:"MaxTimeSteps"`
 
 }
 type LabelDef struct {

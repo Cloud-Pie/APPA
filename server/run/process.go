@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"math/rand"
+	"strconv"
 )
 
 // this will be responsible for taking the data in the format
@@ -474,10 +475,10 @@ func launchVMandDeploy(inputValues InputStruct ){
 	switch inputValues.CSP {
 
 	case "aws":
-		startInstanceAWS(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores , "3600")
+		startInstanceAWS(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores , inputValues.MaxTimeSteps)
 
 	case "gce":
-		startInstanceGCE(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores, inputValues.Zone,"3600" )
+		startInstanceGCE(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores, inputValues.Zone,inputValues.MaxTimeSteps )
 	default:
 		log.Println("Not the correct case")
 
@@ -517,10 +518,18 @@ func updateTestStatus(testName, currentStatus string){
 	}
 	log.Println(" Updating Test Status")
 
-	errMonFin := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"currentstatus":currentStatus,"lastupdated": time.Now().Unix(), }})
-	if errMonFin != nil {
-		log.Fatal("Error::%s", errMonFin)
+	if _, err := strconv.Atoi(currentStatus); err == nil {
+		errMonFin := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"currentstatus":currentStatus,"lastupdated": time.Now().Unix(), }})
+		if errMonFin != nil {
+			log.Fatal("Error::%s", errMonFin)
+		}
+	}else{
+		errMonFin := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"lastupdated": time.Now().Unix(), }})
+		if errMonFin != nil {
+			log.Fatal("Error::%s", errMonFin)
+		}
 	}
+
 	defer mongoSession.Close()
 }
 

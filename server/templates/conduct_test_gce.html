@@ -168,6 +168,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong class="card-title">MaxTimeSteps</strong>
+                            </div>
+                            <div class="card-body">
+                                <input type="text" name="MaxTimeSteps" value="3600">
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-3 col-lg-3"  >
                         <button id="submit-button" type="submit" class="btn btn-lg btn-info btn-block">
                             <i class="fa fa-lock fa-lg"></i>&nbsp;
@@ -203,6 +213,7 @@
             "NumCores": document.forms["startTestForm"]["numCores"].value,
             "CSP": "gce",
             "Zone": document.forms["startTestForm"]["zone"].value,
+            "MaxTimeSteps": document.forms["startTestForm"]["MaxTimeSteps"].value,
 
         };
         console.log(data);
