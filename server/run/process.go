@@ -419,13 +419,13 @@ func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, nu
 	stopChecking := Schedule(func() {
 		log.Println("waiting for some time for the VM to start and run app")
 		// need to have a mechanism by which I query application and stop checking whether its deployed or not
-		getInstanceIp(startedInstanceId,zone)
+		getInstanceIp(testName,zone)
 	}, 30*time.Second)
 	time.Sleep(1 * time.Minute)
 
 	// assuming that it might be finished need to add some check conditions here
 	stopChecking <- true
-	publicAddress:= getInstanceIp(startedInstanceId,zone)
+	publicAddress:= getInstanceIp(testName,zone)
 	log.Println("Public Ip Address : ",publicAddress )
 	log.Println("Starting the App")
 	///updateTargetFiles(publicAddress, "9323","docker_remote", "/targets/targets_docker.json", targetsDocker)
