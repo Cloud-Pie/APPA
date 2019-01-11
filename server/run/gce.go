@@ -188,7 +188,7 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone stri
 			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case)
 
 			rb := &compute.Instance{
-				MachineType:"zones/"+zone+"/machineTypes/"+testVMType, 
+				MachineType:"zones/"+zone+"/machineTypes/"+testVMType,
 				Name:"appa-server",
 				NetworkInterfaces:[]*compute.NetworkInterface{&compute.NetworkInterface{AccessConfigs: []*compute.AccessConfig{&compute.AccessConfig{Name:"External NAT", NetworkTier:"STANDARD"}},
 					Network:"projects/"+project +"/global/networks/"+GCEConfig.NetworkName}},
@@ -204,7 +204,7 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone stri
 			}else{
 				// TODO: Change code below to process the `resp` object:
 				fmt.Printf("%#v\n", resp)
-				return strconv.FormatUint(resp.Id, 64)
+				return strconv.FormatUint(resp.Id, 10)
 			}
 		}
 	}
