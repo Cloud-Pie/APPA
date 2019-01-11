@@ -37,26 +37,24 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th>StartTime</th>
-                        <th>BucketName</th>
-                        <th>NodeInstanceType</th>
+
+                        <th>InstanceType</th>
                         <th>FileName</th>
                         <th>Test_case</th>
                         <th>CSP</th>
-						<th>EndTimestamp</th>
+
                         <th>Phase</th>
                     </tr>
                     </thead>
                     <tfoot>
                     <tr>
 						<th></th>
-                        <th>StartTime</th>
-                        <th>BucketName</th>
+
                         <th>InstanceType</th>
                         <th>FileName</th>
                         <th>Test_case</th>
                         <th>CSP</th>
-						<th>EndTimestamp</th>
+
                         <th>Phase</th>
                     </tr>
                     </tfoot>
@@ -85,8 +83,8 @@
                 '    display: table;">'+
                 '<tr>'+
                 '<td><a href="http://'+d.PublicIpAddress+':3000" class="btn btn-block btn-outline-primary">Grafana</a></td>'+
-                '<td><a href="" class="btn btn-block btn-outline-primary">aaa</a></td>'+
-                '<td><a href="" class="btn btn-block btn-outline-primary">something</a></td>'+
+                '<td>d.StartTimestamp</td>'+
+                '<td>d.EndTimestamp</td>'+
                 '</tr>'+
                 '</table>';
     }
@@ -95,8 +93,8 @@
                 .then(response => response.json())
                 .then(allTestsInfo => {
                     for (i = 0; i < allTestsInfo.length; i++) {
-                        allTestsInfo[i].StartTimestamp = new Date(allTestsInfo[i].StartTimestamp);
-                        allTestsInfo[i].EndTimestamp = new Date(allTestsInfo[i].EndTimestamp);
+                        allTestsInfo[i].StartTimestamp = new Date(allTestsInfo[i].StartTimestamp * 1000);
+                        allTestsInfo[i].EndTimestamp = new Date(allTestsInfo[i].EndTimestamp *1000);
                     }
                     console.log(allTestsInfo);
                     let allData = [];
@@ -110,13 +108,10 @@
                                     "data":           null,
                                     "defaultContent": ''
                                 },
-                                { "data": "StartTimestamp" },
-                                { "data": "BucketName" },
                                 { "data": "InstanceType" },
                                 { "data": "FileName" },
                                 { "data": "Test_case" },
                                 { "data": "CSP" },
-    							 { "data": "EndTimestamp" },
                                 { "data": "Phase" }
                             ],
                             data: allTestsInfo
