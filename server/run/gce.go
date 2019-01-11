@@ -407,7 +407,7 @@ func getInstanceIp(instanceId,zone string) string{
 				// TODO: Change code below to process the `resp` object:
 				fmt.Printf("%#v\n", resp)
 
-				return resp.NetworkInterfaces[0].NetworkIP
+				return resp.NetworkInterfaces[0].AccessConfigs[0].NatIP
 			}
 		}
 	}
