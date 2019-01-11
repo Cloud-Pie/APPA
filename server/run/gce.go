@@ -25,7 +25,7 @@ import (
 // 3. Install and update the Go dependencies by running `go get -u` in the
 //    project directory.
 
-func getVMStartUpScript(gitPath,testName, publicIpTool ,test_case string) string {
+func getVMStartUpScript(gitPath,testName, publicIpTool ,test_case, maxTimeSteps string) string {
 	var VMStartScript = `#!bin/sh
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
@@ -73,18 +73,23 @@ unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data/constant/ openfoam/`+ test_case+ `/openfoam_src/code/
 cd openfoam/`+ test_case+ `/scripts
 sh ./deploy_app.sh
-$file_name = /results/result.tar.gz 
-while [ -ne $file_name ]
+$maxTimeSteps=`+ maxTimeSteps+ `
+$currentStatus="0"
+while [ $currentStatus -ne $maxTimeSteps ]
 do
+   currentStatus=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
+   curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`"/$currentStatus"
    sleep 5m
 done
-if [ -e $file_name]
+
+if [ $currentStatus -e $maxTimeSteps]
 then
+	sleep 10m
 	new_fileName=/results/`+testName+`.tar.gz
     mv $file_name $new_fileName
 	aws s3 cp $new_fileName s3://`+AWSConfig.S3BucketName+`/
 else
-    echo "not found"
+    echo "some issue with if "
 fi
 curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 `
@@ -171,7 +176,7 @@ func addFirewallConfig(project string){
 
 }
 
-func createInstance(project,gitAppPath, testVMType,testName,test_case, zone string) string{
+func createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxTimeSteps string) string{
 
 	ctx := context.Background()
 
@@ -185,7 +190,7 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone stri
 			log.Println(err)
 		}else{
 
-			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case)
+			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps )
 
 			rb := &compute.Instance{
 				MachineType:"zones/"+zone+"/machineTypes/"+testVMType,
@@ -333,7 +338,7 @@ func deleteAll(instanceId,zone string)  {
 	deleteFirewall()
 	deleteInstance(instanceId,zone)
 }
-func createGoogleInstance(gitAppPath, testVMType,testName,test_case,zone string) string {
+func createGoogleInstance(gitAppPath, testVMType,testName,test_case,zone,maxTimeSteps string) string {
 
 	ctx := context.Background()
 
@@ -368,7 +373,7 @@ func createGoogleInstance(gitAppPath, testVMType,testName,test_case,zone string)
 	// assuming that it might be finished need to add some check conditions here
 	stopChecking2 <- true
 
-	instanceID := createInstance(project,gitAppPath, testVMType,testName,test_case, zone)
+	instanceID := createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxTimeSteps)
 
 	return instanceID
 	//time.Sleep(3 * time.Minute)

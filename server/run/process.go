@@ -338,9 +338,9 @@ func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, nu
 
 	AllData := TestInformation{
 		TestName			:  	testName,
-		BucketName		:  	AWSConfig.S3BucketName,
+		BucketName			:  	AWSConfig.S3BucketName,
 		InstanceId 			: 	startedInstanceId,
-		Region			:  	AWSConfig.Region,
+		Region				:  	AWSConfig.Region,
 		StartTimestamp		:	time.Now().Unix(),
 		NumInstances		:   1,
 		InstanceType		:	testVMType,
@@ -351,6 +351,8 @@ func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, nu
 		Phase				:   "Deployment",
 		Test_case			:  test_case,
 		CSP					: "AWS",
+		LastUpdated 		:	time.Now().Unix(),
+		CurrentStatus		: "0",
 	}
 	if err := collection.Insert(AllData); err != nil {
 		log.Fatal("error ", err)
@@ -383,9 +385,9 @@ func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, nu
 	defer mongoSession.Close()
 }
 
-func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, numCores,zone string){
+func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, numCores,zone,maxTimeSteps string){
 
-	startedInstanceId :=createGoogleInstance(gitAppPath, testVMType, testName,test_case,zone)
+	startedInstanceId :=createGoogleInstance(gitAppPath, testVMType, testName,test_case,zone,maxTimeSteps)
 	if( startedInstanceId==""){
 		log.Fatal("Cannot start test VM, terminating test start again latter")
 		return
@@ -409,6 +411,8 @@ func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, nu
 		Phase				:   "Deployment",
 		Test_case			:  test_case,
 		CSP					:  "GCE",
+		LastUpdated 		:	time.Now().Unix(),
+		CurrentStatus		: "0",
 	}
 	if err := collection.Insert(AllData); err != nil {
 		log.Fatal("error ", err)
@@ -467,7 +471,7 @@ func launchVMandDeploy(inputValues InputStruct ){
 		startInstanceAWS(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores )
 
 	case "gce":
-		startInstanceGCE(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores, inputValues.Zone )
+		startInstanceGCE(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores, inputValues.Zone,"3600" )
 	default:
 		log.Println("Not the correct case")
 
@@ -490,6 +494,24 @@ func testFinishedTerminateVM(testName string){
 
 	errMonFin := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"endtimestamp": time.Now().Unix(),
 		"phase": "Completed"}})
+	if errMonFin != nil {
+		log.Fatal("Error::%s", errMonFin)
+	}
+	defer mongoSession.Close()
+}
+
+func updateTestStatus(testName, currentStatus string){
+	mongoSession := GetMongoSession()
+	collection := mongoSession.DB(Database).C(Collection_Name)
+	var testInformation TestInformation
+	err :=  collection.Find(bson.M{"testname":testName}).One(&testInformation)
+	if err != nil {
+		log.Fatal("Db Error : ", err)
+		return
+	}
+	log.Println(" Updating Test Status")
+
+	errMonFin := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"currentstatus":currentStatus,"lastupdated": time.Now().Unix(), }})
 	if errMonFin != nil {
 		log.Fatal("Error::%s", errMonFin)
 	}

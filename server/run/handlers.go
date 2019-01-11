@@ -155,6 +155,28 @@ func DeployAndRunApplication(w http.ResponseWriter, r *http.Request)  {
 		w.Write([]byte("The process has started, check the logs for details!!"))
 	}
 }
+// UpdateCurrentStatusTest godoc
+// @Summary Terminate the VM when the test is finished
+// @Description  Terminate the VM when the test is finished
+// @Tags COMPLETED_TEST
+// @Accept text/html
+// @Produce json
+// @Param testname query string true " testname "
+// @Success 200 {string} string "ok"
+// @Failure 400 {string} string "ok"
+// @Failure 404 {string} string "ok"
+// @Failure 500 {string} string "ok"
+// @Router /updateCurrentStatus/{testname}/{currentStatus}/[get]
+func UpdateCurrentStatusTest(w http.ResponseWriter, r *http.Request)  {
+
+	vars := mux.Vars(r)
+	log.Println("testname=", vars["testname"])
+	log.Println("currentStatus=", vars["currentStatus"])
+
+	go updateTestStatus(vars["testname"],vars["currentStatus"])
+
+	w.Write([]byte("Thanks"))
+}
 
 // TestFinishedTerminateVM godoc
 // @Summary Terminate the VM when the test is finished

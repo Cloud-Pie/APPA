@@ -114,4 +114,11 @@ var routes = Routes{
 		ConductTestGCEHandler,
 	},
 
+
+	Route{
+		"UpdateCurrentStatusTest",
+		strings.ToUpper("Get"),
+		"/updateCurrentStatus/{testname}/{currentStatus}/",
+		UpdateCurrentStatusTest,
+	},
 }

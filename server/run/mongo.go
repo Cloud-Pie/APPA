@@ -32,6 +32,8 @@ type TestInformation struct {
 	NumCells				string `json:"NumCells"`
 	NumCores				string `json:"NumCores"`
 	Test_case				string `json:"Test_case"`
+	CurrentStatus			string `json:"CurrentStatus"`
+	LastUpdated				int64 `json:"LastUpdated"`
 	CSP						string `json:"CSP"`
 }
 
