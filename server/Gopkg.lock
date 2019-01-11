@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "a5c95f26ca7bd27755b2a8faacafede27b2d94e6"
+  revision = "b95770445039c244956bfaff20b73fc1dbb2eefe"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -53,8 +53,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "1f8a24693bc965514ee0d7aadbabe0ceed184a88"
-  version = "v1.16.16"
+  revision = "6d55516ad2946220d9e26804f224c1c215f293ea"
+  version = "v1.16.17"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -86,7 +86,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "be1c187aa6c66b9daa1d9461c228d17e9dd2cab7"
+  revision = "915654e7eabcea33ae277abbecf52f0d8b7a9fdc"
 
 [[projects]]
   branch = "master"
@@ -98,7 +98,7 @@
     "jws",
     "jwt"
   ]
-  revision = "d668ce993890a79bda886613ee587a69dd5da7a6"
+  revision = "fd3eaa146cbb5c89ce187c275fb79bd3a36a5ffc"
 
 [[projects]]
   name = "google.golang.org/api"
