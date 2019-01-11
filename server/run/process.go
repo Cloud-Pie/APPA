@@ -444,7 +444,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
 
 func RandStringRunes(n int) string {
 	b := make([]rune, n)
@@ -459,7 +459,7 @@ func launchVMandDeploy(inputValues InputStruct ){
 
 	log.Println("Starting a test VM of type ", inputValues.InstanceType, " and running the application on cloud ", inputValues.CSP)
 
-	testName:= "appa"+RandStringRunes(5)
+	testName:= "appa"+RandStringRunes(10)
 
 	switch inputValues.CSP {
 
