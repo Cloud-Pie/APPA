@@ -92,7 +92,7 @@ func getPublicIpTool() string {
 	return string(wanip)
 }
 
-func getVMStartScript(gitPath,testName, publicIpTool,test_case string)string{
+func getVMStartScript(gitPath,testName, publicIpTool,test_case, maxTimeSteps string)string{
 	var VMStartScript = `#!bin/sh
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
@@ -140,18 +140,23 @@ unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data/constant/ openfoam/`+ test_case+ `/openfoam_src/code/
 cd openfoam/`+ test_case+ `/scripts
 sh ./deploy_app.sh
-$file_name = /results/result.tar.gz 
-while [ -ne $file_name ]
+$maxTimeSteps=`+ maxTimeSteps+ `
+$currentStatus="0"
+while [ $currentStatus -ne $maxTimeSteps ]
 do
+   currentStatus=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
+   curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`"/$currentStatus"
    sleep 5m
 done
-if [ -e $file_name]
+
+if [ $currentStatus -e $maxTimeSteps]
 then
+	sleep 10m
 	new_fileName=/results/`+testName+`.tar.gz
     mv $file_name $new_fileName
 	aws s3 cp $new_fileName s3://`+AWSConfig.S3BucketName+`/
 else
-    echo "not found"
+    echo "some issue with if "
 fi
 curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 `
@@ -160,7 +165,7 @@ curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 	return encodedString
 }
 
-func startTestVM( gitAppPath, testVMType,testName,test_case string)  string {
+func startTestVM( gitAppPath, testVMType,testName,test_case,maxTimeSteps string)  string {
 
 	sessionAWS := session.Must(session.NewSession(&aws.Config{
 		Credentials: credentials.NewStaticCredentials(AWSConfig.AwsAccessKeyId, AWSConfig.AwsSecretAccessKey, ""),
@@ -199,7 +204,7 @@ func startTestVM( gitAppPath, testVMType,testName,test_case string)  string {
 				},
 			},
 		},
-		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case)),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps)),
 	}
 
 	result, err := svc.RunInstances(input)
@@ -325,9 +330,9 @@ func updateTargetFiles(ip, port, typeTarget, fileName string, targetArray []Prom
 	}
 }
 
-func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, numCores string){
+func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, numCores,maxTimeSteps string){
 
-	startedInstanceId :=startTestVM(gitAppPath, testVMType, testName,test_case)
+	startedInstanceId :=startTestVM(gitAppPath, testVMType, testName,test_case,maxTimeSteps)
 	if( startedInstanceId==""){
 		log.Fatal("Cannot start test VM, terminating test start again latter")
 		return
@@ -468,7 +473,7 @@ func launchVMandDeploy(inputValues InputStruct ){
 	switch inputValues.CSP {
 
 	case "aws":
-		startInstanceAWS(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores )
+		startInstanceAWS(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores , "3600")
 
 	case "gce":
 		startInstanceGCE(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores, inputValues.Zone,"3600" )
