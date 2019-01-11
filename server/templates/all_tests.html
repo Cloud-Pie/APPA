@@ -94,8 +94,10 @@
         fetch("/getAllTestsInformation")
                 .then(response => response.json())
                 .then(allTestsInfo => {
-                    allTestsInfo.StartTimestamp = new Date(allTestsInfo.StartTimestamp * 1000);
-                    allTestsInfo.EndTimestamp = new Date(allTestsInfo.EndTimestamp * 1000);
+                    for (i = 0; i < allTestsInfo.length; i++) {
+                        allTestsInfo[i].StartTimestamp = new Date(allTestsInfo[i].StartTimestamp);
+                        allTestsInfo[i].EndTimestamp = new Date(allTestsInfo[i].EndTimestamp);
+                    }
                     console.log(allTestsInfo);
                     let allData = [];
                     //Once we fetch the list, we iterate over it
