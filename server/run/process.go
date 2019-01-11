@@ -153,8 +153,8 @@ done
 if [ $currentStatus = $maxTimeSteps]
 then
 	sleep 10m
-	new_fileName=openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
-    mv openfoam/`+ test_case+ `/results/result.tar.gz $new_fileName
+	new_fileName=/openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
+    mv /openfoam/`+ test_case+ `/results/result.tar.gz $new_fileName
 	aws s3 cp $new_fileName s3://`+AWSConfig.S3BucketName+`/
 else
     echo "some issue with if "
