@@ -73,12 +73,13 @@ unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data/constant/ openfoam/`+ test_case+ `/openfoam_src/code/
 cd openfoam/`+ test_case+ `/scripts
 sh ./deploy_app.sh
-$maxTimeSteps=`+ maxTimeSteps+ `
-$currentStatus="0"
+maxTimeSteps=`+ maxTimeSteps+ `
+currentStatus=0
 while [ $currentStatus -ne $maxTimeSteps ]
 do
-   currentStatus=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
-   curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`"/$currentStatus"
+   currentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
+   curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
+   currentStatus=$currentVal
    sleep 5m
 done
 
