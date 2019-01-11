@@ -73,21 +73,21 @@ unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data/constant/ openfoam/`+ test_case+ `/openfoam_src/code/
 cd openfoam/`+ test_case+ `/scripts
 sh ./deploy_app.sh
+cd /openfoam/`+ test_case+ `/openfoam_src/code/
 maxTimeSteps=`+ maxTimeSteps+ `
 currentStatus=0
-while [ $currentStatus -ne $maxTimeSteps ]
+while [ $currentStatus != $maxTimeSteps ]
 do
    currentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
    curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
    currentStatus=$currentVal
    sleep 5m
 done
-
-if [ $currentStatus -e $maxTimeSteps]
+if [ $currentStatus = $maxTimeSteps]
 then
 	sleep 10m
-	new_fileName=/results/`+testName+`.tar.gz
-    mv $file_name $new_fileName
+	new_fileName=openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
+    mv openfoam/`+ test_case+ `/results/result.tar.gz $new_fileName
 	aws s3 cp $new_fileName s3://`+AWSConfig.S3BucketName+`/
 else
     echo "some issue with if "
