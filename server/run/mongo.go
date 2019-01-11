@@ -35,6 +35,7 @@ type TestInformation struct {
 	CurrentStatus			string `json:"CurrentStatus"`
 	LastUpdated				int64 `json:"LastUpdated"`
 	CSP						string `json:"CSP"`
+	MaxTimeSteps			string `json:"MaxTimeSteps"`
 }
 
 

@@ -360,6 +360,7 @@ func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, nu
 		CSP					: "AWS",
 		LastUpdated 		:	time.Now().Unix(),
 		CurrentStatus		: "0",
+		MaxTimeSteps		: maxTimeSteps,
 	}
 	if err := collection.Insert(AllData); err != nil {
 		log.Fatal("error ", err)
@@ -420,6 +421,7 @@ func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, nu
 		CSP					:  "GCE",
 		LastUpdated 		:	time.Now().Unix(),
 		CurrentStatus		: "0",
+		MaxTimeSteps		: maxTimeSteps,
 	}
 	if err := collection.Insert(AllData); err != nil {
 		log.Fatal("error ", err)
