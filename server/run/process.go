@@ -11,11 +11,11 @@ import (
 	"time"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"gopkg.in/mgo.v2/bson"
-	"strconv"
 	"strings"
 	"fmt"
 	"encoding/json"
 	"io/ioutil"
+	"math/rand"
 )
 
 // this will be responsible for taking the data in the format
@@ -440,11 +440,26 @@ func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, nu
 
 	defer mongoSession.Close()
 }
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func RandStringRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+
 func launchVMandDeploy(inputValues InputStruct ){
 
 	log.Println("Starting a test VM of type ", inputValues.InstanceType, " and running the application on cloud ", inputValues.CSP)
 
-	testName:= "appa_"+strconv.FormatInt(time.Now().Unix(), 10)
+	testName:= "appa"+RandStringRunes(5)
 
 	switch inputValues.CSP {
 

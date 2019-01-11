@@ -189,7 +189,7 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone stri
 
 			rb := &compute.Instance{
 				MachineType:"zones/"+zone+"/machineTypes/"+testVMType,
-				Name:testName,
+				Name:"appa-server",
 				NetworkInterfaces:[]*compute.NetworkInterface{&compute.NetworkInterface{AccessConfigs: []*compute.AccessConfig{&compute.AccessConfig{Name:"External NAT", NetworkTier:"STANDARD"}},
 					Network:"projects/"+project +"/global/networks/"+GCEConfig.NetworkName}},
 				Disks:[]*compute.AttachedDisk{&compute.AttachedDisk{ AutoDelete:true, Boot: true, InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",
