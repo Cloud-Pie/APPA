@@ -70,8 +70,9 @@ wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
 tar xfz google-cloud-sdk.tar.gz -C ./
 cd google-cloud-sdk 
 ./install.sh
-myvar=`+authContents+`;
-destdir="./service-account.json"
+myvar=`+authContents+`
+echo $myvar
+destdir="/service-account.json"
 cat <<EOT >> $destdir
 $myvar
 EOT
@@ -238,6 +239,7 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxT
 		}else{
 
 			authContents:=readFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+			fmt.Println(authContents)
 			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps,authContents )
 
 			rb := &compute.Instance{
