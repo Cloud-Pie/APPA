@@ -19,7 +19,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "015ebf3bd03f64bc5c51deb14fcd5bf172e6d79d"
+  revision = "6ec6c42b8b068515bde269c2c256098c7e7349c3"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -61,8 +61,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "a2484497433aa110263c045df2f1d49336b38cfd"
-  version = "v1.16.22"
+  revision = "c1afd6c3340feedd0a2c1cd929dcb291d4bd09ba"
+  version = "v1.16.23"
 
 [[projects]]
   name = "github.com/golang/protobuf"
