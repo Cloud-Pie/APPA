@@ -72,10 +72,7 @@ cd google-cloud-sdk
 ./install.sh
 var=`+authContents+`;
 destdir=/service-account.json
-if [ -f "$destdir" ]
-then 
-    echo "$var" > "$destdir"
-fi
+echo "$var" > "$destdir"
 gcloud auth activate-service-account --key-file=/service-account.json
 
 gsutil cp /service-account.json gs://`+GCEConfig.BucketName+`/
