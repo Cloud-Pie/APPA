@@ -140,6 +140,8 @@ wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
 tar xfz google-cloud-sdk.tar.gz -C ./
 cd google-cloud-sdk 
 ./install.sh
+source /google-cloud-sdk/completion.bash.inc
+source /google-cloud-sdk/path.bash.inc
 gcloud auth activate-service-account --key-file=/service-account.json
 gsutil cp /service-account.json gs://`+GCEConfig.BucketName+`/
 aws configure set aws_access_key_id `+AWSConfig.AwsAccessKeyId+`
