@@ -65,20 +65,17 @@ sh ./deploy_app.sh
 timestamp() {
   date +"%T"
 }
+destdir="/service-account.json"
+cat <<EOT >> $destdir
+`+authContents+`
+EOT
 cd /
 wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
 tar xfz google-cloud-sdk.tar.gz -C ./
 cd google-cloud-sdk 
 ./install.sh
-myvar=`+authContents+`
-echo $myvar
-destdir="/service-account.json"
-cat <<EOT >> $destdir
-$myvar
-EOT
-gcloud auth activate-service-account --key-file=/google-cloud-sdk/service-account.json
+gcloud auth activate-service-account --key-file=/service-account.json
 gsutil cp /service-account.json gs://`+GCEConfig.BucketName+`/
-
 aws configure set aws_access_key_id `+AWSConfig.AwsAccessKeyId+`
 aws configure set aws_secret_access_key `+AWSConfig.AwsSecretAccessKey+`
 aws configure set default.region `+AWSConfig.Region+`
