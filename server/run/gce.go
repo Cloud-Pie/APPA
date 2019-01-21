@@ -9,6 +9,9 @@ import (
 	"google.golang.org/api/compute/v1"
 	"time"
 	"strconv"
+	"io/ioutil"
+	"os"
+	"cloud.google.com/go/storage"
 )
 
 // BEFORE RUNNING:
@@ -25,7 +28,7 @@ import (
 // 3. Install and update the Go dependencies by running `go get -u` in the
 //    project directory.
 
-func getVMStartUpScript(gitPath,testName, publicIpTool ,test_case, maxTimeSteps string) string {
+func getVMStartUpScript(gitPath,testName, publicIpTool ,test_case, maxTimeSteps,authContents string) string {
 	var VMStartScript = `#!bin/sh
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
@@ -63,6 +66,20 @@ timestamp() {
   date +"%T"
 }
 cd /
+wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
+tar xfz google-cloud-sdk -C ./
+cd google-cloud-sdk 
+./install.sh
+var=`+authContents+`;
+destdir=/service-account.json
+if [ -f "$destdir" ]
+then 
+    echo "$var" > "$destdir"
+fi
+gcloud auth activate-service-account --key-file=/service-account.json
+
+gsutil cp /service-account.json gs://`+GCEConfig.BucketName+`/
+
 aws configure set aws_access_key_id `+AWSConfig.AwsAccessKeyId+`
 aws configure set aws_secret_access_key `+AWSConfig.AwsSecretAccessKey+`
 aws configure set default.region `+AWSConfig.Region+`
@@ -89,6 +106,7 @@ then
 	new_fileName=/openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
     mv /openfoam/`+ test_case+ `/results/result.tar.gz $new_fileName
 	aws s3 cp $new_fileName s3://`+AWSConfig.S3BucketName+`/
+	gsutil cp $new_fileName gs://`+GCEConfig.BucketName+`/
 else
     echo "some issue with if "
 fi
@@ -97,6 +115,14 @@ curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 	return VMStartScript
 }
 
+func readFile(filePath string) string{
+
+	dat, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(dat)
+}
 
 func createNetwork(project string ){
 	ctx := context.Background()
@@ -144,6 +170,28 @@ func createNetwork(project string ){
 	}
 }
 
+func createBucket(project string){
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}else {
+
+		// Sets the name for the new bucket.
+		bucketName := GCEConfig.BucketName
+
+		// Creates a Bucket instance.
+		bucket := client.Bucket(bucketName)
+
+		// Creates the new bucket.
+		if err := bucket.Create(ctx, project, nil); err != nil {
+			log.Fatalf("Failed to create bucket: %v", err)
+		}
+
+		fmt.Printf("Bucket %v created.\n", bucketName)
+	}
+
+}
 func addFirewallConfig(project string){
 	ctx := context.Background()
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)
@@ -191,7 +239,8 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxT
 			log.Println(err)
 		}else{
 
-			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps )
+			authContents:=readFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps,authContents )
 
 			rb := &compute.Instance{
 				MachineType:"zones/"+zone+"/machineTypes/"+testVMType,
@@ -352,6 +401,7 @@ func createGoogleInstance(gitAppPath, testVMType,testName,test_case,zone,maxTime
 	// Project ID for this request.
 	project := creds.ProjectID
 	createNetwork(project)
+	createBucket(project)
 
 	stopChecking := Schedule(func() {
 		log.Println("waiting for some time for the network to become ready")
