@@ -17,6 +17,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"strconv"
+	"os"
 )
 
 // this will be responsible for taking the data in the format
@@ -93,7 +94,7 @@ func getPublicIpTool() string {
 	return string(wanip)
 }
 
-func getVMStartScript(gitPath,testName, publicIpTool,test_case, maxTimeSteps string)string{
+func getVMStartScript(gitPath,testName, publicIpTool,test_case, maxTimeSteps,authContents string)string{
 	var VMStartScript = `#!bin/sh
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
@@ -131,10 +132,21 @@ timestamp() {
   date +"%T"
 }
 cd /
+wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
+tar xfz google-cloud-sdk.tar.gz -C ./
+cd google-cloud-sdk 
+./install.sh
+myvar=`+authContents+`
+echo $myvar
+destdir="/service-account.json"
+cat <<EOT >> $destdir
+$myvar
+EOT
 aws configure set aws_access_key_id `+AWSConfig.AwsAccessKeyId+`
 aws configure set aws_secret_access_key `+AWSConfig.AwsSecretAccessKey+`
 aws configure set default.region `+AWSConfig.Region+`
 aws configure set region `+AWSConfig.Region+`
+aws s3 cp /service-account.json s3://`+AWSConfig.S3BucketName+`/
 git clone `+ gitPath+ `
 aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
@@ -176,7 +188,8 @@ func startTestVM( gitAppPath, testVMType,testName,test_case,maxTimeSteps string)
 
 	svc := ec2.New(sessionAWS)
 	var allInstancesStarted []Ec2Instances
-
+	authContents:=readFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+	fmt.Println(authContents)
 	input := &ec2.RunInstancesInput{
 		BlockDeviceMappings: []*ec2.BlockDeviceMapping{
 			{
@@ -206,7 +219,7 @@ func startTestVM( gitAppPath, testVMType,testName,test_case,maxTimeSteps string)
 				},
 			},
 		},
-		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps)),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps,authContents)),
 	}
 
 	result, err := svc.RunInstances(input)
