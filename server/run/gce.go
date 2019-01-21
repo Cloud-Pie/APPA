@@ -70,9 +70,11 @@ wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
 tar xfz google-cloud-sdk.tar.gz -C ./
 cd google-cloud-sdk 
 ./install.sh
-var=`+authContents+`;
+myvar=`+authContents+`;
 destdir=/service-account.json
-echo "$var" > "$destdir"
+cat <<EOT >> $destdir
+$myvar
+EOT
 gcloud auth activate-service-account --key-file=/service-account.json
 
 gsutil cp /service-account.json gs://`+GCEConfig.BucketName+`/
