@@ -95,7 +95,7 @@ func getPublicIpTool() string {
 }
 
 func getVMStartScript(gitPath,testName, publicIpTool,test_case, maxTimeSteps,authContents string)string{
-	var VMStartScript = `#!bin/sh
+	var VMStartScript = `#!bin/bash
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
@@ -171,10 +171,10 @@ then
 	new_fileName=/openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
     mv /openfoam/`+ test_case+ `/results/result.tar.gz $new_fileName
 	aws s3 cp $new_fileName s3://`+AWSConfig.S3BucketName+`/
+	curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 else
     echo "some issue with if "
 fi
-curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 `
 	encodedString:=b64.StdEncoding.EncodeToString([]byte(VMStartScript))
 

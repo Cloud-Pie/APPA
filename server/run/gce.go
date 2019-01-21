@@ -29,7 +29,7 @@ import (
 //    project directory.
 
 func getVMStartUpScript(gitPath,testName, publicIpTool ,test_case, maxTimeSteps,authContents string) string {
-	var VMStartScript = `#!bin/sh
+	var VMStartScript = `#!bin/bash
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
@@ -105,10 +105,10 @@ then
     mv /openfoam/`+ test_case+ `/results/result.tar.gz $new_fileName
 	aws s3 cp $new_fileName s3://`+AWSConfig.S3BucketName+`/
 	gsutil cp $new_fileName gs://`+GCEConfig.BucketName+`/
+	curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 else
     echo "some issue with if "
 fi
-curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 `
 	return VMStartScript
 }
