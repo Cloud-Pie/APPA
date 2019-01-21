@@ -67,7 +67,7 @@ timestamp() {
 }
 cd /
 wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
-tar xfz google-cloud-sdk -C ./
+tar xfz google-cloud-sdk.tar.gz -C ./
 cd google-cloud-sdk 
 ./install.sh
 var=`+authContents+`;
