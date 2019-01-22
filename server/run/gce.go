@@ -95,7 +95,7 @@ do
    currentStatus=$currentVal
    sleep 5m
 done
-if [ $currentStatus = $maxTimeSteps]
+if [ $currentStatus = $maxTimeSteps ]
 then
 	sleep 10m
 	new_fileName=/openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
@@ -444,8 +444,8 @@ func deleteInstance(instanceId,zone string){
 }
 
 func deleteAll(instanceId,zone string)  {
-	deleteNetwork()
-	deleteFirewall()
+	//deleteNetwork()
+	//deleteFirewall()
 	deleteInstance(instanceId,zone)
 }
 func createGoogleInstance(gitAppPath, testVMType,testName,test_case,zone,maxTimeSteps string) string {

@@ -242,7 +242,7 @@ func startTestVM( gitAppPath, testVMType,testName,test_case,maxTimeSteps string)
 	return allInstancesStarted[0].InstanceId
 }
 
-func terminateTestVM(instanceId, csp, zone string) {
+func terminateTestVM(instanceId, csp, zone, testName string) {
 
 	switch csp {
 
@@ -271,7 +271,7 @@ func terminateTestVM(instanceId, csp, zone string) {
 		log.Println("Terminate Instances with id: ", allInstances)
 
 	case "GCE":
-		deleteAll(instanceId,zone)
+		deleteAll(testName,zone)
 	}
 
 
@@ -500,7 +500,7 @@ func testFinishedTerminateVM(testName string){
 		return
 	}
 	log.Println(" Terminating the VM")
-	terminateTestVM(testInformation.InstanceId, testInformation.CSP, testInformation.Region)
+	terminateTestVM(testInformation.InstanceId, testInformation.CSP, testInformation.Region, testInformation.TestName)
 
 	errMonFin := collection.Update(bson.M{"testname": testName}, bson.M{"$set": bson.M{"endtimestamp": time.Now().Unix(),
 		"phase": "Completed"}})
