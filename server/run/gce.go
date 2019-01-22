@@ -59,7 +59,7 @@ remote_read:
   - url: "http://`+publicIpTool+`:8086/api/v1/prom/read?db=`+testName+`&u=root&p=root"
 EOT
 cd docker-node-monitoring/local/scripts
-sh ./deploy_app.sh
+#sh ./deploy_app.sh
 # Define a timestamp function
 timestamp() {
   date +"%T"
@@ -88,8 +88,11 @@ sh ./deploy_app.sh
 cd /openfoam/`+ test_case+ `/openfoam_src/code/
 maxTimeSteps=`+ maxTimeSteps+ `
 currentStatus=0
+echo "current status"
+echo $currentStatus
 while [ $currentStatus != $maxTimeSteps ]
 do
+	echo "current status"
 	echo $currentStatus
 	currentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
 	curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
