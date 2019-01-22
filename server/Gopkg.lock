@@ -19,7 +19,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "27d06e78a97fc3a9c7e442f4e476785ce53609bf"
+  revision = "ac535dd179786091bd48390579cfb86da6edf9a3"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -157,7 +157,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "770c60269bf0ef965e9e7ac8bedcb6bca2a1cefd"
+  revision = "054c452bb702e465e95ce8e7a3d9a6cf0cd1188d"
 
 [[projects]]
   name = "golang.org/x/text"

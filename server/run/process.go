@@ -153,7 +153,7 @@ do
 	currentStatus=$currentVal
 	sleep 5m
 done
-if [ $currentStatus = $maxTimeSteps]
+if [ $currentStatus = $maxTimeSteps ]
 then
 	sleep 10m
 	new_fileName=/openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
