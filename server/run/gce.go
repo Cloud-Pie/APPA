@@ -78,6 +78,7 @@ source /google-cloud-sdk/path.bash.inc
 gcloud auth activate-service-account --key-file=/service-account.json
 cd /
 git clone `+ gitPath+ `
+export BOTO_CONFIG=/dev/null
 gsutil cp gs://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data/constant/ openfoam/`+ test_case+ `/openfoam_src/code/
@@ -98,6 +99,7 @@ then
 	sleep 10m
 	new_fileName=/openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
     mv /openfoam/`+ test_case+ `/results/result.tar.gz $new_fileName
+	export BOTO_CONFIG=/dev/null
 	gsutil cp $new_fileName gs://`+GCEConfig.BucketName+`/
 	curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 else
