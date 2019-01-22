@@ -67,19 +67,39 @@ func DownloadData(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: GIve the download link to download the file based upon the name
 	// a call to data handler will be made here
-	w.Write([]byte("Data from the cli will be handled here!!"))
+	vars := mux.Vars(r)
+	log.Println("objectname=", vars["objectname"])
+	log.Println("csp=", vars["csp"])
+	if(vars["csp"]=="gce"){
+		go downloadObject(vars["objectname"])
+		w.Write([]byte("Wait for file to get downloaded"))
+	}else{
+		go downloadObjectS3(vars["objectname"])
+		w.Write([]byte("Wait for file to get downloaded"))
+	}
 }
 
 func ListAllStoredFiles(w http.ResponseWriter, r *http.Request)  {
 
 	//Here the list of all available files will be provided!!
-	res:=listObjectsInBucket()
-
-	b, err := json.Marshal(res)
-	if err != nil {
-		log.Println("error:", err)
+	//res:=listObjectsInBucket()
+	vars := mux.Vars(r)
+	log.Println("csp=", vars["csp"])
+	if(vars["csp"]=="gce"){
+		res:=listObjects()
+		b, err := json.Marshal(res)
+		if err != nil {
+			log.Println("error:", err)
+		}
+		w.Write([]byte(b))
+	}else{
+		res:=listObjectsInBucket()
+		b, err := json.Marshal(res)
+		if err != nil {
+			log.Println("error:", err)
+		}
+		w.Write([]byte(b))
 	}
-	w.Write([]byte(b))
 }
 // GetAllTestsInformation godoc
 // @Summary Get all the tests information

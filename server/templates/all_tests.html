@@ -42,7 +42,7 @@
                         <th>FileName</th>
                         <th>Test_case</th>
                         <th>CSP</th>
-
+                        <th>CurrentStatus</th>
                         <th>Phase</th>
                     </tr>
                     </thead>
@@ -54,7 +54,7 @@
                         <th>FileName</th>
                         <th>Test_case</th>
                         <th>CSP</th>
-
+                        <th>CurrentStatus</th>
                         <th>Phase</th>
                     </tr>
                     </tfoot>
@@ -85,6 +85,8 @@
                 '<td><a href="http://'+d.PublicIpAddress+':3000" class="btn btn-block btn-outline-primary">Grafana</a></td>'+
                 '<td>'+d.StartTimestamp+'</td>'+
                 '<td>'+d.EndTimestamp+'</td>'+
+                '<td><a href="/downloadData/'+d.FileName+'/'+d.CSP+'/" class="btn btn-block btn-outline-primary">Download to server</a></td>'+
+                '<td><a href="/app/assets/'+d.FileName+'/" class="btn btn-block btn-outline-primary">Download from server</a></td>'+
                 '</tr>'+
                 '</table>';
     }
@@ -112,6 +114,7 @@
                                 { "data": "FileName" },
                                 { "data": "Test_case" },
                                 { "data": "CSP" },
+                                { "data": "CurrentStatus" },
                                 { "data": "Phase" }
                             ],
                             data: allTestsInfo

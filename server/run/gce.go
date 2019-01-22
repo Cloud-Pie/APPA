@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/iterator"
 )
 
 // BEFORE RUNNING:
@@ -36,7 +37,6 @@ apt-get install -y apt-transport-https ca-certificates curl software-properties-
 apt-get --assume-yes install git
 apt-get install -y python-pip python-dev build-essential 
 apt-get install -y unzip
-apt-get -y install awscli
 apt-get install -y \
     apt-transport-https \
     ca-certificates \
@@ -50,7 +50,6 @@ add-apt-repository \
 apt-get update
 apt-get install -y docker-ce
 curl -XPOST 'http://`+publicIpTool+`:8086/query' --data-urlencode 'q=CREATE DATABASE "`+testName+`"'
-pip install awscli --upgrade --user
 git clone https://github.com/ansjin/docker-node-monitoring.git
 FILE="docker-node-monitoring/local/prometheus/prometheus.yml"
 cat <<EOT >> $FILE
@@ -69,7 +68,6 @@ destdir="/service-account.json"
 cat <<EOT >> $destdir
 `+authContents+`
 EOT
-cd /
 wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
 tar xfz google-cloud-sdk.tar.gz -C ./
 cd google-cloud-sdk 
@@ -77,13 +75,8 @@ cd google-cloud-sdk
 source /google-cloud-sdk/completion.bash.inc
 source /google-cloud-sdk/path.bash.inc
 gcloud auth activate-service-account --key-file=/service-account.json
-gsutil cp /service-account.json gs://`+GCEConfig.BucketName+`/
-aws configure set aws_access_key_id `+AWSConfig.AwsAccessKeyId+`
-aws configure set aws_secret_access_key `+AWSConfig.AwsSecretAccessKey+`
-aws configure set default.region `+AWSConfig.Region+`
-aws configure set region `+AWSConfig.Region+`
 git clone `+ gitPath+ `
-aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
+gsutil cp gs://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data/constant/ openfoam/`+ test_case+ `/openfoam_src/code/
 cd openfoam/`+ test_case+ `/scripts
@@ -103,7 +96,6 @@ then
 	sleep 10m
 	new_fileName=/openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
     mv /openfoam/`+ test_case+ `/results/result.tar.gz $new_fileName
-	aws s3 cp $new_fileName s3://`+AWSConfig.S3BucketName+`/
 	gsutil cp $new_fileName gs://`+GCEConfig.BucketName+`/
 	curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 else
@@ -190,6 +182,70 @@ func createBucket(project string){
 	}
 
 }
+
+func listObjects() []string{
+
+	var objectNames []string
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Println("Failed to create client: %v", err)
+	}else {
+		// Sets the name for the new bucket.
+		bucketName := GCEConfig.BucketName
+		it := client.Bucket(bucketName).Objects(ctx, nil)
+		for {
+			attrs, err := it.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				log.Println(err)
+			}else{
+				//fmt.Fprintln(w, attrs.Name)
+				objectNames = append(objectNames, attrs.Name)
+			}
+		}
+	}
+	return objectNames
+}
+
+func downloadObject(object string){
+
+	fileName := "/app/assets/"+object
+	file, err := os.Create(fileName)
+	if err != nil {
+		log.Println("Unable to open file %q, %v", err)
+	}else {
+		defer file.Close()
+		ctx := context.Background()
+		client, err := storage.NewClient(ctx)
+		if err != nil {
+			log.Println("Failed to create client: %v", err)
+		}else {
+			// Sets the name for the new bucket.
+			bucketName := GCEConfig.BucketName
+			rc, err := client.Bucket(bucketName).Object(object).NewReader(ctx)
+			if err != nil {
+				log.Println(err)
+			}else{
+				defer rc.Close()
+				data, err := ioutil.ReadAll(rc)
+				if err != nil {
+					log.Println(err)
+				}else {
+					n2, err := file.Write(data)
+					if err != nil {
+						log.Println(err)
+					}
+					fmt.Printf("wrote %d bytes\n", n2)
+				}
+			}
+		}
+	}
+}
+
+
 func addFirewallConfig(project string){
 	ctx := context.Background()
 	c, err := google.DefaultClient(ctx, compute.CloudPlatformScope)

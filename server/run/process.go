@@ -17,6 +17,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"strconv"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"os"
 )
 
@@ -94,7 +95,7 @@ func getPublicIpTool() string {
 	return string(wanip)
 }
 
-func getVMStartScript(gitPath,testName, publicIpTool,test_case, maxTimeSteps,authContents string)string{
+func getVMStartScript(gitPath,testName, publicIpTool,test_case, maxTimeSteps string)string{
 	var VMStartScript = `#!bin/bash
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
@@ -132,18 +133,6 @@ timestamp() {
   date +"%T"
 }
 cd /
-destdir="/service-account.json"
-cat <<EOT >> $destdir
-`+authContents+`
-EOT
-wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
-tar xfz google-cloud-sdk.tar.gz -C ./
-cd google-cloud-sdk 
-./install.sh
-source /google-cloud-sdk/completion.bash.inc
-source /google-cloud-sdk/path.bash.inc
-gcloud auth activate-service-account --key-file=/service-account.json
-gsutil cp /service-account.json gs://`+GCEConfig.BucketName+`/
 aws configure set aws_access_key_id `+AWSConfig.AwsAccessKeyId+`
 aws configure set aws_secret_access_key `+AWSConfig.AwsSecretAccessKey+`
 aws configure set default.region `+AWSConfig.Region+`
@@ -190,8 +179,6 @@ func startTestVM( gitAppPath, testVMType,testName,test_case,maxTimeSteps string)
 
 	svc := ec2.New(sessionAWS)
 	var allInstancesStarted []Ec2Instances
-	authContents:=readFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-	fmt.Println(authContents)
 	input := &ec2.RunInstancesInput{
 		BlockDeviceMappings: []*ec2.BlockDeviceMapping{
 			{
@@ -221,7 +208,7 @@ func startTestVM( gitAppPath, testVMType,testName,test_case,maxTimeSteps string)
 				},
 			},
 		},
-		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps,authContents)),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps)),
 	}
 
 	result, err := svc.RunInstances(input)
@@ -585,6 +572,37 @@ func listObjectsInBucket() *s3.ListObjectsOutput{
 	// TODO: Need to check this format, currently its directly sent to cli but only names are to be sent to cli
 	log.Println(result)
 	return result
+}
+
+func downloadObjectS3(objectName string)  {
+	// 1) Define your bucket and item names
+	fileName := "/app/assets/"+objectName
+	// 2) Create an AWS session
+	sessionAWS := session.Must(session.NewSession(&aws.Config{
+		Credentials: credentials.NewStaticCredentials(AWSConfig.AwsAccessKeyId, AWSConfig.AwsSecretAccessKey, ""),
+		Region:      aws.String(AWSConfig.Region),
+	}))
+	// 3) Create a new AWS S3 downloader
+	downloader := s3manager.NewDownloader(sessionAWS)
+
+	file, err := os.Create(fileName)
+	if err != nil {
+		log.Println("Unable to open file %q, %v", err)
+	}else{
+		defer file.Close()
+		// 4) Download the item from the bucket. If an error occurs, log it and exit. Otherwise, notify the user that the download succeeded.
+		numBytes, err := downloader.Download(file,
+			&s3.GetObjectInput{
+				Bucket: aws.String(AWSConfig.S3BucketName),
+				Key:    aws.String(objectName),
+			})
+
+		if err != nil {
+			log.Fatalf("Unable to download item %q, %v", objectName, err)
+		}else {
+			fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
+		}
+	}
 }
 
 func getAllTestsInformation() []TestInformation{

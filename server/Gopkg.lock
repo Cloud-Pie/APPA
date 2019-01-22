@@ -19,7 +19,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "6ec6c42b8b068515bde269c2c256098c7e7349c3"
+  revision = "7e0564601990e8998f6dda90bbf8c1ac222514ee"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -59,6 +59,8 @@
     "private/protocol/xml/xmlutil",
     "service/ec2",
     "service/s3",
+    "service/s3/s3iface",
+    "service/s3/s3manager",
     "service/sts"
   ]
   revision = "c1afd6c3340feedd0a2c1cd929dcb291d4bd09ba"
@@ -277,6 +279,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b28b06763b74e78ce27d2fe84b2a71c110169495d1ec9d32be698f4ecfe017d8"
+  inputs-digest = "7b1e90545e5d5f154f69dfc9f6c2e55484026f281572e9fa8f5898855e5224ae"
   solver-name = "gps-cdcl"
   solver-version = 1

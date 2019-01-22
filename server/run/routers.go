@@ -59,7 +59,7 @@ var routes = Routes{
 	Route{
 		"DownloadData",
 		strings.ToUpper("Get"),
-		"/downloadData",
+		"/downloadData/{objectname}/{csp}",
 		DownloadData,
 	},
 	Route{
@@ -71,7 +71,7 @@ var routes = Routes{
 	Route{
 		"ListAllStoredFiles",
 		strings.ToUpper("Get"),
-		"/listAllStoredFiles",
+		"/listAllStoredFiles/{csp}",
 		ListAllStoredFiles,
 	},
 	Route{
