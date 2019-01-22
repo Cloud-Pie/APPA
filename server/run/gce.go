@@ -78,6 +78,7 @@ source /google-cloud-sdk/path.bash.inc
 gcloud auth activate-service-account --key-file=/service-account.json
 cd /
 git clone `+ gitPath+ `
+sudo rm -f /etc/boto.cfg
 export BOTO_CONFIG=/dev/null
 gsutil cp gs://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
