@@ -94,9 +94,20 @@ while [ $currentStatus != $maxTimeSteps ]
 do
 	echo "current status"
 	echo $currentStatus
-	currentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
-	curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
-	currentStatus=$currentVal
+	re='^[0-9]+$'
+	if ! [[ $currentVal =~ $re ]] 
+	then
+   		echo "Not a number";
+		cd $currentVal
+		newcurrentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
+		curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$newcurrentVal"
+		cd ..
+		currentStatus=$newcurrentVal
+	else
+		echo "A number";
+		curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
+		currentStatus=$currentVal
+	fi
 	sleep 5m
 done
 if [ $currentStatus = $maxTimeSteps ]
