@@ -127,7 +127,7 @@ remote_read:
   - url: "http://`+publicIpTool+`:8086/api/v1/prom/read?db=`+testName+`&u=root&p=root"
 EOT
 cd docker-node-monitoring/local/scripts
-#sh ./deploy_app.sh
+sh ./deploy_app.sh
 # Define a timestamp function
 timestamp() {
   date +"%T"
