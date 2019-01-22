@@ -12,14 +12,14 @@
     "internal/version",
     "storage"
   ]
-  revision = "0ebda48a7f143b1cce9eb37a8c1106ac762a3430"
-  version = "v0.34.0"
+  revision = "40ff2484543d2a069aefbff61252e2c22441ed55"
+  version = "v0.35.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "88ae8640f12a3c3eaa1501a8b9fd0adff195207e"
+  revision = "2e0ffbc612c9e9a1f72316e7e3892eef243ba611"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -81,10 +81,7 @@
 
 [[projects]]
   name = "github.com/googleapis/gax-go"
-  packages = [
-    ".",
-    "v2"
-  ]
+  packages = ["v2"]
   revision = "c8a15bac9b9fe955bd9f900272f9a306465d28cf"
   version = "v2.0.3"
 
@@ -224,7 +221,7 @@
     "googleapis/rpc/code",
     "googleapis/rpc/status"
   ]
-  revision = "db91494dd46c1fdcbbde05e5ff5eb56df8f7d79a"
+  revision = "eef12c790cc0dd8c2f45010a7f88e60f49521c9f"
 
 [[projects]]
   name = "google.golang.org/grpc"
