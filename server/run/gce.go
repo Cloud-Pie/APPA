@@ -91,10 +91,10 @@ currentStatus=0
 while [ $currentStatus != $maxTimeSteps ]
 do
 	echo $currentStatus
-   currentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
-   curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
-   currentStatus=$currentVal
-   sleep 5m
+	currentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
+	curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
+	currentStatus=$currentVal
+	sleep 5m
 done
 if [ $currentStatus = $maxTimeSteps ]
 then
@@ -105,7 +105,7 @@ then
 	gsutil cp $new_fileName gs://`+GCEConfig.BucketName+`/
 	curl -L "http://`+publicIpTool+`:8080/testFinishedTerminateVM/`+testName+`"
 else
-    echo "some issue with if "
+	echo "some issue with if "
 fi
 `
 	return VMStartScript
