@@ -70,7 +70,7 @@ func DownloadData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	log.Println("objectname=", vars["objectname"])
 	log.Println("csp=", vars["csp"])
-	if(vars["csp"]=="gce"){
+	if(vars["csp"]=="GCE"){
 		go downloadObject(vars["objectname"])
 		w.Write([]byte("Wait for file to get downloaded"))
 	}else{
@@ -85,7 +85,7 @@ func ListAllStoredFiles(w http.ResponseWriter, r *http.Request)  {
 	//res:=listObjectsInBucket()
 	vars := mux.Vars(r)
 	log.Println("csp=", vars["csp"])
-	if(vars["csp"]=="gce"){
+	if(vars["csp"]=="GCE"){
 		res:=listObjects()
 		b, err := json.Marshal(res)
 		if err != nil {
