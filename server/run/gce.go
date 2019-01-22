@@ -90,6 +90,7 @@ maxTimeSteps=`+ maxTimeSteps+ `
 currentStatus=0
 while [ $currentStatus != $maxTimeSteps ]
 do
+	echo $currentStatus
    currentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
    curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
    currentStatus=$currentVal
