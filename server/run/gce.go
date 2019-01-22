@@ -296,7 +296,7 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxT
 		}else{
 
 			authContents:=readFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-			fmt.Println(authContents)
+			//fmt.Println(authContents)
 			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps,authContents )
 
 			rb := &compute.Instance{
