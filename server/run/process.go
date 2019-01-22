@@ -137,7 +137,6 @@ aws configure set aws_access_key_id `+AWSConfig.AwsAccessKeyId+`
 aws configure set aws_secret_access_key `+AWSConfig.AwsSecretAccessKey+`
 aws configure set default.region `+AWSConfig.Region+`
 aws configure set region `+AWSConfig.Region+`
-aws s3 cp /service-account.json s3://`+AWSConfig.S3BucketName+`/
 git clone `+ gitPath+ `
 aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data

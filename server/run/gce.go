@@ -68,6 +68,7 @@ destdir="/service-account.json"
 cat <<EOT >> $destdir
 `+authContents+`
 EOT
+cd /
 wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz
 tar xfz google-cloud-sdk.tar.gz -C ./
 cd google-cloud-sdk 
@@ -75,6 +76,7 @@ cd google-cloud-sdk
 source /google-cloud-sdk/completion.bash.inc
 source /google-cloud-sdk/path.bash.inc
 gcloud auth activate-service-account --key-file=/service-account.json
+cd /
 git clone `+ gitPath+ `
 gsutil cp gs://boundarydata/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
