@@ -150,24 +150,20 @@ echo "current status"
 echo $currentStatus
 while [ $currentStatus != $maxTimeSteps ]
 do
+	cd /openfoam/`+ test_case+ `/openfoam_src/code/
 	echo "current status"
 	echo $currentStatus
 	currentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
-	re='^[0-9]+$'
-	if ! [[ $currentVal =~ $re ]] 
+	if [ $currentVal = $maxTimeSteps ]
 	then
-   		echo "Not a number";
-		cd $currentVal
-		newcurrentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
-		curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$newcurrentVal"
-		cd /openfoam/`+ test_case+ `/openfoam_src/code/
-		currentStatus=$newcurrentVal
-	else
-		echo "A number";
 		curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
 		currentStatus=$currentVal
+	else
+		cd $(echo $currentVal | tr -d '\r')
+		newcurrentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
+		curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$newcurrentVal"
+		sleep 5m
 	fi
-	sleep 5m
 done
 if [ $currentStatus = $maxTimeSteps ]
 then
