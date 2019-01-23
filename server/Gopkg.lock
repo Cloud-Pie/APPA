@@ -19,7 +19,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "88af467a6b2bf4b233df3c6b3bc7c1bdd6e6d6cc"
+  revision = "c99f5c902f7c5c94a5d5f703679e25db948e1d3a"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -221,7 +221,7 @@
     "googleapis/rpc/code",
     "googleapis/rpc/status"
   ]
-  revision = "eef12c790cc0dd8c2f45010a7f88e60f49521c9f"
+  revision = "8819c946db4494a2259bf100a377f51aa585d893"
 
 [[projects]]
   name = "google.golang.org/grpc"
