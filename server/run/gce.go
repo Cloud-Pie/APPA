@@ -94,6 +94,7 @@ while [ $currentStatus != $maxTimeSteps ]
 do
 	echo "current status"
 	echo $currentStatus
+	currentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
 	re='^[0-9]+$'
 	if ! [[ $currentVal =~ $re ]] 
 	then
