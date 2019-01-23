@@ -159,7 +159,8 @@ do
 		curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$currentVal"
 		currentStatus=$currentVal
 	else
-		cd $(echo $currentVal | tr -d '\r')
+		cd "$currentVal"
+		echo $currentVal
 		newcurrentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
 		curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$newcurrentVal"
 		sleep 5m
