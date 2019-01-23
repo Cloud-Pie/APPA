@@ -159,7 +159,7 @@ do
 		cd $currentVal
 		newcurrentVal=$(ls -td -- */ | head -n 1 | cut -d'/' -f1)
 		curl -L "http://`+publicIpTool+`:8080/updateCurrentStatus/`+testName+`/$newcurrentVal"
-		cd ..
+		cd /openfoam/`+ test_case+ `/openfoam_src/code/
 		currentStatus=$newcurrentVal
 	else
 		echo "A number";
