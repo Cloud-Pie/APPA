@@ -51,6 +51,7 @@ type InputStruct struct {
 	CSP  				    string		`json:"CSP"`
 	Zone  				    string		`json:"Zone"`
 	MaxTimeSteps		    string		`json:"MaxTimeSteps"`
+	BdataBucketName		    string		`json:"BdataBucketName"`
 
 }
 type LabelDef struct {

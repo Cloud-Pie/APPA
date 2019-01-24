@@ -29,7 +29,7 @@ import (
 // 3. Install and update the Go dependencies by running `go get -u` in the
 //    project directory.
 
-func getVMStartUpScript(gitPath,testName, publicIpTool ,test_case, maxTimeSteps,authContents string) string {
+func getVMStartUpScript(gitPath,testName, publicIpTool ,test_case, maxTimeSteps,authContents,boundaryDataBucketName string) string {
 	var VMStartScript = `#!bin/bash
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
@@ -80,7 +80,7 @@ cd /
 git clone `+ gitPath+ `
 sudo rm -f /etc/boto.cfg
 export BOTO_CONFIG=/dev/null
-gsutil cp gs://boundarydata/Inlet_Data.zip Inlet_Data.zip
+gsutil cp gs://`+ boundaryDataBucketName+ `/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data/constant/ openfoam/`+ test_case+ `/openfoam_src/code/
 cd openfoam/`+ test_case+ `/scripts
@@ -297,7 +297,7 @@ func addFirewallConfig(project string){
 
 }
 
-func createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxTimeSteps string) string{
+func createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxTimeSteps,boundaryDataBucketName string) string{
 
 	ctx := context.Background()
 
@@ -313,7 +313,7 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxT
 
 			authContents:=readFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 			//fmt.Println(authContents)
-			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps,authContents )
+			vmStartscript:=getVMStartUpScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps,authContents,boundaryDataBucketName )
 
 			rb := &compute.Instance{
 				MachineType:"zones/"+zone+"/machineTypes/"+testVMType,
@@ -321,7 +321,7 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxT
 				NetworkInterfaces:[]*compute.NetworkInterface{&compute.NetworkInterface{AccessConfigs: []*compute.AccessConfig{&compute.AccessConfig{Name:"External NAT", NetworkTier:"STANDARD"}},
 					Network:"projects/"+project +"/global/networks/"+GCEConfig.NetworkName}},
 				Disks:[]*compute.AttachedDisk{&compute.AttachedDisk{ AutoDelete:true, Boot: true, InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",
-					DiskSizeGb:50, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}}},
+					DiskSizeGb:100, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}}},
 				Metadata:&compute.Metadata{Items:[]*compute.MetadataItems{&compute.MetadataItems{Key:"startup-script",Value: &vmStartscript}}},
 				// TODO: Add desired fields of the request body.
 			}
@@ -461,7 +461,7 @@ func deleteAll(instanceId,zone string)  {
 	//deleteFirewall()
 	deleteInstance(instanceId,zone)
 }
-func createGoogleInstance(gitAppPath, testVMType,testName,test_case,zone,maxTimeSteps string) string {
+func createGoogleInstance(gitAppPath, testVMType,testName,test_case,zone,maxTimeSteps, boundaryDataBucketName string) string {
 
 	ctx := context.Background()
 
@@ -497,7 +497,7 @@ func createGoogleInstance(gitAppPath, testVMType,testName,test_case,zone,maxTime
 	// assuming that it might be finished need to add some check conditions here
 	stopChecking2 <- true
 
-	instanceID := createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxTimeSteps)
+	instanceID := createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxTimeSteps,boundaryDataBucketName)
 
 	return instanceID
 	//time.Sleep(3 * time.Minute)

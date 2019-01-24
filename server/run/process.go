@@ -95,7 +95,7 @@ func getPublicIpTool() string {
 	return string(wanip)
 }
 
-func getVMStartScript(gitPath,testName, publicIpTool,test_case, maxTimeSteps string)string{
+func getVMStartScript(gitPath,testName, publicIpTool,test_case, maxTimeSteps,BdataBucketName string)string{
 	var VMStartScript = `#!bin/bash
 apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual 
 apt-get update  
@@ -138,7 +138,7 @@ aws configure set aws_secret_access_key `+AWSConfig.AwsSecretAccessKey+`
 aws configure set default.region `+AWSConfig.Region+`
 aws configure set region `+AWSConfig.Region+`
 git clone `+ gitPath+ `
-aws s3 cp s3://boundarydata/Inlet_Data.zip Inlet_Data.zip
+aws s3 cp s3://`+BdataBucketName+`/Inlet_Data.zip Inlet_Data.zip
 unzip Inlet_Data.zip -d Inlet_Data
 cp -R Inlet_Data/Inlet_Data/constant/ openfoam/`+ test_case+ `/openfoam_src/code/
 cd openfoam/`+ test_case+ `/scripts
@@ -182,7 +182,7 @@ fi
 	return encodedString
 }
 
-func startTestVM( gitAppPath, testVMType,testName,test_case,maxTimeSteps string)  string {
+func startTestVM( gitAppPath, testVMType,testName,test_case,maxTimeSteps,BdataBucketName string)  string {
 
 	sessionAWS := session.Must(session.NewSession(&aws.Config{
 		Credentials: credentials.NewStaticCredentials(AWSConfig.AwsAccessKeyId, AWSConfig.AwsSecretAccessKey, ""),
@@ -220,7 +220,7 @@ func startTestVM( gitAppPath, testVMType,testName,test_case,maxTimeSteps string)
 				},
 			},
 		},
-		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps)),
+		UserData: aws.String(getVMStartScript(gitAppPath,testName, AWSConfig.PublicIpServer, test_case,maxTimeSteps,BdataBucketName)),
 	}
 
 	result, err := svc.RunInstances(input)
@@ -346,9 +346,9 @@ func updateTargetFiles(ip, port, typeTarget, fileName string, targetArray []Prom
 	}
 }
 
-func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, numCores,maxTimeSteps string){
+func startInstanceAWS( testName string, inputValues InputStruct){
 
-	startedInstanceId :=startTestVM(gitAppPath, testVMType, testName,test_case,maxTimeSteps)
+	startedInstanceId :=startTestVM(inputValues.AppGitPath, inputValues.InstanceType, testName,inputValues.Test_case,inputValues.MaxTimeSteps, inputValues.BdataBucketName)
 	if( startedInstanceId==""){
 		log.Fatal("Cannot start test VM, terminating test start again latter")
 		return
@@ -364,17 +364,17 @@ func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, nu
 		Region				:  	AWSConfig.Region,
 		StartTimestamp		:	time.Now().Unix(),
 		NumInstances		:   1,
-		InstanceType		:	testVMType,
-		GitPath				: 	gitAppPath,
+		InstanceType		:	inputValues.InstanceType,
+		GitPath				: 	inputValues.AppGitPath,
 		FileName			: 	testName+".tar.gz",
-		NumCells 			: 	numCells,
-		NumCores			: 	numCores,
+		NumCells 			: 	inputValues.NumCells,
+		NumCores			: 	inputValues.NumCores,
 		Phase				:   "Deployment",
-		Test_case			:  test_case,
+		Test_case			:  inputValues.Test_case,
 		CSP					: "AWS",
 		LastUpdated 		:	time.Now().Unix(),
 		CurrentStatus		: "0",
-		MaxTimeSteps		: maxTimeSteps,
+		MaxTimeSteps		: inputValues.MaxTimeSteps,
 	}
 	if err := collection.Insert(AllData); err != nil {
 		log.Fatal("error ", err)
@@ -407,9 +407,10 @@ func startInstanceAWS( testName, gitAppPath , testVMType,test_case, numCells, nu
 	defer mongoSession.Close()
 }
 
-func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, numCores,zone,maxTimeSteps string){
+func startInstanceGCE( testName string, inputValues InputStruct){
 
-	startedInstanceId :=createGoogleInstance(gitAppPath, testVMType, testName,test_case,zone,maxTimeSteps)
+	startedInstanceId :=createGoogleInstance(inputValues.AppGitPath, inputValues.InstanceType, testName,inputValues.Test_case,inputValues.Zone,
+												inputValues.MaxTimeSteps, inputValues.BdataBucketName)
 	if( startedInstanceId==""){
 		log.Fatal("Cannot start test VM, terminating test start again latter")
 		return
@@ -422,20 +423,20 @@ func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, nu
 		TestName			:  	testName,
 		BucketName			:  	GCEConfig.BucketName,
 		InstanceId 			: 	startedInstanceId,
-		Region				:  	zone,
+		Region				:  	inputValues.Zone,
 		StartTimestamp		:	time.Now().Unix(),
 		NumInstances		:   1,
-		InstanceType		:	testVMType,
-		GitPath				: 	gitAppPath,
+		InstanceType		:	inputValues.InstanceType,
+		GitPath				: 	inputValues.AppGitPath,
 		FileName			: 	testName+".tar.gz",
-		NumCells 			: 	numCells,
-		NumCores			: 	numCores,
+		NumCells 			: 	inputValues.NumCells,
+		NumCores			: 	inputValues.NumCores,
 		Phase				:   "Deployment",
-		Test_case			:  test_case,
+		Test_case			:  inputValues.Test_case,
 		CSP					:  "GCE",
 		LastUpdated 		:	time.Now().Unix(),
 		CurrentStatus		: "0",
-		MaxTimeSteps		: maxTimeSteps,
+		MaxTimeSteps		: inputValues.MaxTimeSteps,
 	}
 	if err := collection.Insert(AllData); err != nil {
 		log.Fatal("error ", err)
@@ -446,13 +447,13 @@ func startInstanceGCE( testName, gitAppPath , testVMType,test_case, numCells, nu
 	stopChecking := Schedule(func() {
 		log.Println("waiting for some time for the VM to start and run app")
 		// need to have a mechanism by which I query application and stop checking whether its deployed or not
-		getInstanceIp(testName,zone)
+		getInstanceIp(testName,inputValues.Zone)
 	}, 30*time.Second)
 	time.Sleep(1 * time.Minute)
 
 	// assuming that it might be finished need to add some check conditions here
 	stopChecking <- true
-	publicAddress:= getInstanceIp(testName,zone)
+	publicAddress:= getInstanceIp(testName,inputValues.Zone)
 	log.Println("Public Ip Address : ",publicAddress )
 	log.Println("Starting the App")
 	///updateTargetFiles(publicAddress, "9323","docker_remote", "/targets/targets_docker.json", targetsDocker)
@@ -491,10 +492,10 @@ func launchVMandDeploy(inputValues InputStruct ){
 	switch inputValues.CSP {
 
 	case "aws":
-		startInstanceAWS(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores , inputValues.MaxTimeSteps)
+		startInstanceAWS(testName,inputValues)
 
 	case "gce":
-		startInstanceGCE(testName,inputValues.AppGitPath , inputValues.InstanceType,inputValues.Test_case, inputValues.NumCells, inputValues.NumCores, inputValues.Zone,inputValues.MaxTimeSteps )
+		startInstanceGCE(testName,inputValues)
 	default:
 		log.Println("Not the correct case")
 

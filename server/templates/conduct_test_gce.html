@@ -124,11 +124,6 @@
 
                                 <select name="zone" data-placeholder="Select Region/Zone..." class="standardSelect" tabindex="1">
                                     <option value=""></option>
-                                    <optgroup label="asia-east1">
-                                        <option value="asia-east1-a">asia-east1-a</option>
-                                        <option value="asia-east1-b">asia-east1-b</option>
-                                        <option value="asia-east1-c">asia-east1-c</option>
-                                    </optgroup>
                                     <optgroup label="asia-east2">
                                         <option value="asia-east2-a">asia-east2-a</option>
                                         <option value="asia-east2-b">asia-east2-b</option>
@@ -138,11 +133,6 @@
                                         <option value="europe-north1-a">europe-north1-a</option>
                                         <option value="europe-north1-b">europe-north1-b</option>
                                         <option value="europe-north1-c">europe-north1-c</option>
-                                    </optgroup>
-                                    <optgroup label="europe-west1">
-                                        <option value="europe-west1-a">europe-west1-a</option>
-                                        <option value="europe-west1-b">europe-west1-b</option>
-                                        <option value="europe-west1-c">europe-west1-c</option>
                                     </optgroup>
                                     <optgroup label="europe-west2">
                                         <option value="europe-west2-a">europe-west2-a</option>
@@ -154,15 +144,52 @@
                                         <option value="europe-west3-b">europe-west3-b</option>
                                         <option value="europe-west3-c">europe-west3-c</option>
                                     </optgroup>
+                                    <optgroup label="europe-west1">
+                                        <option value="europe-west1-b">europe-west1-b</option>
+                                        <option value="europe-west1-c">europe-west1-c</option>
+                                        <option value="europe-west1-d">europe-west1-d</option>
+                                    </optgroup>
+
                                     <optgroup label="us-central1">
                                         <option value="us-central1-a">us-central1-a</option>
                                         <option value="us-central1-b">us-central1-b</option>
                                         <option value="us-central1-c">us-central1-c</option>
+                                        <option value="us-central1-f">us-central1-f</option>
+                                    </optgroup>
+                                    <optgroup label="us-east1">
+                                        <option value="us-east1-b">us-east1-b</option>
+                                        <option value="us-east1-c">us-east1-c</option>
+                                        <option value="us-east1-d">us-east1-d</option>
+                                    </optgroup>
+                                    <optgroup label="us-east4">
+                                        <option value="us-east4-a">us-east4-a</option>
+                                        <option value="us-east4-b">us-east4-b</option>
+                                        <option value="us-east4-c">us-east4-c</option>
+                                    </optgroup>
+                                    <optgroup label="us-west1">
+                                        <option value="us-west1-a">us-west1-a</option>
+                                        <option value="us-west1-b">us-west1-b</option>
+                                        <option value="us-west1-c">us-west1-c</option>
                                     </optgroup>
                                     <optgroup label="europe-west4">
                                         <option value="europe-west4-a">europe-west4-a</option>
                                         <option value="europe-west4-b">europe-west4-b</option>
                                         <option value="europe-west4-c">europe-west4-c</option>
+                                    </optgroup>
+                                    <optgroup label="asia-southeast1">
+                                        <option value="asia-southeast1-a">asia-southeast1-a</option>
+                                        <option value="asia-southeast1-b">asia-southeast1-b</option>
+                                        <option value="asia-southeast1-c">asia-southeast1-c</option>
+                                    </optgroup>
+                                    <optgroup label="asia-northeast1">
+                                        <option value="asia-northeast1-a">asia-northeast1-a</option>
+                                        <option value="asia-northeast1-b">asia-northeast1-b</option>
+                                        <option value="asia-northeast1-c">asia-northeast1-c</option>
+                                    </optgroup>
+                                    <optgroup label="asia-east1">
+                                        <option value="asia-east1-a">asia-east1-a</option>
+                                        <option value="asia-east1-b">asia-east1-b</option>
+                                        <option value="asia-east1-c">asia-east1-c</option>
                                     </optgroup>
                                 </select>
                             </div>
@@ -175,6 +202,16 @@
                             </div>
                             <div class="card-body">
                                 <input type="text" name="MaxTimeSteps" value="3600">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong class="card-title">Boundary Data Bucket Name</strong>
+                            </div>
+                            <div class="card-body">
+                                <input type="text" name="BdataBucketName" value="boundarydata">
                             </div>
                         </div>
                     </div>
@@ -214,6 +251,7 @@
             "CSP": "gce",
             "Zone": document.forms["startTestForm"]["zone"].value,
             "MaxTimeSteps": document.forms["startTestForm"]["MaxTimeSteps"].value,
+            "BdataBucketName": document.forms["startTestForm"]["BdataBucketName"].value,
 
         };
         console.log(data);
