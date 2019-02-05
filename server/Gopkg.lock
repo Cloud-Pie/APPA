@@ -19,7 +19,7 @@
   branch = "master"
   name = "github.com/Cloud-Pie/APPA"
   packages = ["server/run"]
-  revision = "41b8f0ff1847d840a12baa4a3e4931e7910b9ecb"
+  revision = "00ba27e201a3542cbec74da190416a52ced38a9e"
 
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
@@ -63,8 +63,8 @@
     "service/s3/s3manager",
     "service/sts"
   ]
-  revision = "2598a5134c77e8121a3a558f263a2dc50479a93f"
-  version = "v1.16.24"
+  revision = "949cbce4e4443b72f6da12adbeb5d416dd506fbe"
+  version = "v1.16.27"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -86,16 +86,10 @@
   version = "v2.0.3"
 
 [[projects]]
-  name = "github.com/gorilla/context"
-  packages = ["."]
-  revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
-  version = "v1.1.1"
-
-[[projects]]
   name = "github.com/gorilla/mux"
   packages = ["."]
-  revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
-  version = "v1.6.2"
+  revision = "a7962380ca08b5a188038c69871b8d3fbdf31e89"
+  version = "v1.7.0"
 
 [[projects]]
   name = "github.com/jmespath/go-jmespath"
@@ -136,7 +130,7 @@
     "internal/timeseries",
     "trace"
   ]
-  revision = "ed066c81e75eba56dd9bd2139ade88125b855585"
+  revision = "d26f9f9a57f3fab6a695bec0d84433c2c50f8bbf"
 
 [[projects]]
   branch = "master"
@@ -148,13 +142,13 @@
     "jws",
     "jwt"
   ]
-  revision = "5dab4167f31cbd76b407f1486c86b40748bc5073"
+  revision = "99b60b757ec124ebb7d6b7e97f153b19c10ce163"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "b90733256f2e882e81d52f9126de08df5615afd9"
+  revision = "41f3e6584952bb034a481797859f6ab34b6803bd"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -221,7 +215,7 @@
     "googleapis/rpc/code",
     "googleapis/rpc/status"
   ]
-  revision = "8819c946db4494a2259bf100a377f51aa585d893"
+  revision = "4b09977fb92221987e99d190c8f88f2c92727a29"
 
 [[projects]]
   name = "google.golang.org/grpc"
