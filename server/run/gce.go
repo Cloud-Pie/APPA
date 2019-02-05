@@ -110,7 +110,7 @@ do
 done
 if [ $currentStatus = $maxTimeSteps ]
 then
-	sleep 10m
+	sleep 60m
 	new_fileName=/openfoam/`+ test_case+ `/results/`+testName+`.tar.gz
     mv /openfoam/`+ test_case+ `/results/result.tar.gz $new_fileName
 	export BOTO_CONFIG=/dev/null
@@ -321,7 +321,7 @@ func createInstance(project,gitAppPath, testVMType,testName,test_case, zone,maxT
 				NetworkInterfaces:[]*compute.NetworkInterface{&compute.NetworkInterface{AccessConfigs: []*compute.AccessConfig{&compute.AccessConfig{Name:"External NAT", NetworkTier:"STANDARD"}},
 					Network:"projects/"+project +"/global/networks/"+GCEConfig.NetworkName}},
 				Disks:[]*compute.AttachedDisk{&compute.AttachedDisk{ AutoDelete:true, Boot: true, InitializeParams: &compute.AttachedDiskInitializeParams{Description:"instance disk for appa server",
-					DiskSizeGb:100, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}}},
+					DiskSizeGb:200, SourceImage:"projects/ubuntu-os-cloud/global/images/family/ubuntu-1804-lts"}}},
 				Metadata:&compute.Metadata{Items:[]*compute.MetadataItems{&compute.MetadataItems{Key:"startup-script",Value: &vmStartscript}}},
 				// TODO: Add desired fields of the request body.
 			}
