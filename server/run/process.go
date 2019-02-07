@@ -284,7 +284,7 @@ func terminateTestVM(instanceId, csp, zone, testName string) {
 		log.Println("Terminate Instances with id: ", allInstances)
 
 	case "GCE":
-		deleteAll(testName,zone)
+		//deleteAll(testName,zone)
 	}
 
 
